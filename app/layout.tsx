@@ -2,7 +2,10 @@
 import type { ReactNode } from "react";
 import "./globals.css";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sombreros-tres-raices.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Sombreros Tres Raices",
     template: "%s | Sombreros Tres Raices"
@@ -36,4 +39,3 @@ export default function RootLayout({
     </html>
   );
 }
-

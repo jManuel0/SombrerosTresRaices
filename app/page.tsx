@@ -1,14 +1,13 @@
 ﻿"use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-
-type Product = {
-  name: string;
-  price: number;
-  image: string;
-};
+import { featuredProducts } from "@/lib/products";
+import type { Product } from "@/lib/products";
+import { cartStorageKey, createCartMessage, createWhatsAppUrl, formatPrice } from "@/lib/shop";
+import type { CartItem } from "@/lib/shop";
 
 type TrustItem = {
   title: string;
@@ -16,32 +15,8 @@ type TrustItem = {
   icon: ReactNode;
 };
 
-type CartItem = Product & {
-  quantity: number;
-};
-
-const whatsappNumber = "573104010930";
-
-const products: Product[] = [
-  {
-    name: "Sombrero Aguadeño Clásico",
-    price: 189000,
-    image: "https://picsum.photos/seed/tres-raices-aguadeno/720/840"
-  },
-  {
-    name: "Sombrero Vueltiao Dorado",
-    price: 245000,
-    image: "https://picsum.photos/seed/tres-raices-vueltiao/720/840"
-  },
-  {
-    name: "Fedora Artesanal Arcilla",
-    price: 215000,
-    image: "https://picsum.photos/seed/tres-raices-fedora/720/840"
-  }
-];
-
 const navLinks = [
-  { label: "Catálogo", href: "#catalogo" },
+  { label: "Catálogo", href: "/catalogo" },
   { label: "Nosotros", href: "#nosotros" },
   { label: "Contacto", href: "#contacto" }
 ];
@@ -64,47 +39,45 @@ const trustItems: TrustItem[] = [
   }
 ];
 
-const currencyFormatter = new Intl.NumberFormat("es-CO", {
-  style: "currency",
-  currency: "COP",
-  maximumFractionDigits: 0
-});
-
-function formatPrice(price: number) {
-  return currencyFormatter.format(price);
-}
-
-function createWhatsAppUrl(message: string) {
-  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-}
-
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [hasLoadedCart, setHasLoadedCart] = useState(false);
+
+  useEffect(() => {
+    try {
+      const savedCart = window.localStorage.getItem(cartStorageKey);
+
+      if (savedCart) {
+        setCartItems(JSON.parse(savedCart) as CartItem[]);
+      }
+    } catch {
+      window.localStorage.removeItem(cartStorageKey);
+    } finally {
+      setHasLoadedCart(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedCart) {
+      return;
+    }
+
+    window.localStorage.setItem(cartStorageKey, JSON.stringify(cartItems));
+  }, [cartItems, hasLoadedCart]);
 
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   const cartTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-
-  const cartMessage = useMemo(() => {
-    if (cartItems.length === 0) {
-      return "Hola, quiero recibir asesoría sobre los sombreros de Sombreros Tres Raices.";
-    }
-
-    const productLines = cartItems
-      .map((item) => `${item.quantity} x ${item.name} (${formatPrice(item.price)})`)
-      .join("\n");
-
-    return `Hola, quiero comprar estos sombreros:\n${productLines}\nTotal: ${formatPrice(cartTotal)}`;
-  }, [cartItems, cartTotal]);
+  const cartMessage = useMemo(() => createCartMessage(cartItems, cartTotal), [cartItems, cartTotal]);
 
   function addToCart(product: Product) {
     setCartItems((currentItems) => {
-      const existingItem = currentItems.find((item) => item.name === product.name);
+      const existingItem = currentItems.find((item) => item.id === product.id);
 
       if (existingItem) {
         return currentItems.map((item) =>
-          item.name === product.name ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
 
@@ -113,12 +86,16 @@ export default function Home() {
     setIsCartOpen(true);
   }
 
-  function removeFromCart(productName: string) {
+  function removeFromCart(productId: string) {
     setCartItems((currentItems) =>
       currentItems
-        .map((item) => (item.name === productName ? { ...item, quantity: item.quantity - 1 } : item))
+        .map((item) => (item.id === productId ? { ...item, quantity: item.quantity - 1 } : item))
         .filter((item) => item.quantity > 0)
     );
+  }
+
+  function clearCart() {
+    setCartItems([]);
   }
 
   return (
@@ -139,6 +116,7 @@ export default function Home() {
         cartTotal={cartTotal}
         isOpen={isCartOpen}
         message={cartMessage}
+        onClear={clearCart}
         onClose={() => setIsCartOpen(false)}
         onRemove={removeFromCart}
       />
@@ -163,15 +141,15 @@ function Navbar({
   return (
     <header className="sticky top-0 z-50 border-b border-[#d9c18e]/60 bg-[#fbf5ea]/90 backdrop-blur">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
-        <a href="#" className="font-serif text-xl font-bold tracking-wide text-[#173326]" onClick={onMenuClose}>
+        <Link href="/" className="font-serif text-xl font-bold tracking-wide text-[#173326]" onClick={onMenuClose}>
           Sombreros Tres Raices
-        </a>
+        </Link>
 
         <div className="hidden items-center gap-8 text-sm font-medium uppercase tracking-[0.18em] text-[#315c48] md:flex">
           {navLinks.map((link) => (
-            <a key={link.label} href={link.href} className="transition hover:text-[#b85c38]">
+            <Link key={link.label} href={link.href} className="transition hover:text-[#b85c38]">
               {link.label}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -192,7 +170,7 @@ function Navbar({
 
           <button
             type="button"
-            aria-label={isMenuOpen ? "Cerrar menu" : "Abrir menu"}
+            aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={isMenuOpen}
             className="flex h-11 w-11 items-center justify-center rounded-full border border-[#d9c18e] bg-[#173326] text-[#fffaf1] md:hidden"
             onClick={onMenuToggle}
@@ -206,14 +184,14 @@ function Navbar({
         <div className="border-t border-[#d9c18e]/60 bg-[#fffaf1] px-5 py-5 shadow-lg md:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-3">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.label}
                 href={link.href}
                 className="rounded-md px-3 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#173326] transition hover:bg-[#e8dcc6]"
                 onClick={onMenuClose}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -248,12 +226,12 @@ function Hero() {
             Piezas artesanales con fibra natural, presencia elegante y el carácter cálido de la tradición colombiana.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <a
-              href="#catalogo"
+            <Link
+              href="/catalogo"
               className="inline-flex items-center justify-center rounded-full bg-[#c49a3a] px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] text-[#102018] shadow-[0_18px_45px_rgba(16,32,24,0.38)] transition hover:-translate-y-1 hover:bg-[#e8c96d]"
             >
               Ver catálogo
-            </a>
+            </Link>
             <a
               href={createWhatsAppUrl("Hola, quiero asesoría para elegir un sombrero artesanal.")}
               className="inline-flex items-center justify-center rounded-full border border-[#fffaf1]/70 px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] text-[#fffaf1] transition hover:-translate-y-1 hover:bg-[#fffaf1] hover:text-[#173326]"
@@ -284,36 +262,50 @@ function CatalogPreview({ onAddToCart }: { onAddToCart: (product: Product) => vo
         </div>
 
         <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {products.map((product) => (
-            <article
-              key={product.name}
-              className="group overflow-hidden rounded-lg border border-[#d9c18e] bg-[#fbf5ea] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
-            >
-              <div className="relative aspect-[4/5] overflow-hidden bg-[#d8cfb7]">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  sizes="(min-width: 768px) 33vw, 100vw"
-                  className="object-cover transition duration-500 group-hover:scale-105"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="font-serif text-2xl font-bold text-[#14221b]">{product.name}</h3>
-                <p className="mt-3 text-lg font-semibold text-[#b85c38]">{formatPrice(product.price)}</p>
-                <button
-                  type="button"
-                  className="mt-6 w-full rounded-full border border-[#173326] bg-[#173326] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#fffaf1] transition hover:border-[#b85c38] hover:bg-[#b85c38]"
-                  onClick={() => onAddToCart(product)}
-                >
-                  Añadir al carrito
-                </button>
-              </div>
-            </article>
+          {featuredProducts.map((product) => (
+            <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} />
           ))}
+        </div>
+
+        <div className="mt-10 text-center">
+          <Link
+            href="/catalogo"
+            className="inline-flex items-center justify-center rounded-full border border-[#173326] px-7 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#173326] transition hover:bg-[#173326] hover:text-[#fffaf1]"
+          >
+            Ver todos los sombreros
+          </Link>
         </div>
       </div>
     </section>
+  );
+}
+
+function ProductCard({ product, onAddToCart }: { product: Product; onAddToCart: (product: Product) => void }) {
+  return (
+    <article className="group overflow-hidden rounded-lg border border-[#d9c18e] bg-[#fbf5ea] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <div className="relative aspect-[4/5] overflow-hidden bg-[#d8cfb7]">
+        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          sizes="(min-width: 768px) 33vw, 100vw"
+          className="object-cover transition duration-500 group-hover:scale-105"
+        />
+      </div>
+      <div className="p-6">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#b85c38]">{product.category}</p>
+        <h3 className="mt-2 font-serif text-2xl font-bold text-[#14221b]">{product.name}</h3>
+        <p className="mt-3 text-sm leading-6 text-[#315c48]">{product.description}</p>
+        <p className="mt-4 text-lg font-semibold text-[#b85c38]">{formatPrice(product.price)}</p>
+        <button
+          type="button"
+          className="mt-6 w-full rounded-full border border-[#173326] bg-[#173326] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#fffaf1] transition hover:border-[#b85c38] hover:bg-[#b85c38]"
+          onClick={() => onAddToCart(product)}
+        >
+          Añadir al carrito
+        </button>
+      </div>
+    </article>
   );
 }
 
@@ -342,6 +334,7 @@ function CartPanel({
   cartTotal,
   isOpen,
   message,
+  onClear,
   onClose,
   onRemove
 }: {
@@ -349,8 +342,9 @@ function CartPanel({
   cartTotal: number;
   isOpen: boolean;
   message: string;
+  onClear: () => void;
   onClose: () => void;
-  onRemove: (productName: string) => void;
+  onRemove: (productId: string) => void;
 }) {
   if (!isOpen) {
     return null;
@@ -378,7 +372,7 @@ function CartPanel({
           {cartItems.length > 0 ? (
             <div className="space-y-4">
               {cartItems.map((item) => (
-                <div key={item.name} className="rounded-lg border border-[#d9c18e] bg-[#fbf5ea] p-4">
+                <div key={item.id} className="rounded-lg border border-[#d9c18e] bg-[#fbf5ea] p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h3 className="font-serif text-xl font-bold text-[#14221b]">{item.name}</h3>
@@ -389,13 +383,16 @@ function CartPanel({
                     <button
                       type="button"
                       className="rounded-full border border-[#d9c18e] px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-[#b85c38] transition hover:bg-[#f0dfcb]"
-                      onClick={() => onRemove(item.name)}
+                      onClick={() => onRemove(item.id)}
                     >
                       Quitar
                     </button>
                   </div>
                 </div>
               ))}
+              <button type="button" className="text-sm font-semibold text-[#b85c38] underline" onClick={onClear}>
+                Vaciar carrito
+              </button>
             </div>
           ) : (
             <div className="rounded-lg border border-dashed border-[#d9c18e] bg-[#fbf5ea] p-6 text-[#315c48]">
@@ -444,9 +441,9 @@ function Footer() {
 
         <div className="flex flex-wrap gap-5 text-sm font-medium uppercase tracking-[0.16em] text-[#d9c18e]">
           {navLinks.map((link) => (
-            <a key={link.label} href={link.href} className="transition hover:text-[#e8c96d]">
+            <Link key={link.label} href={link.href} className="transition hover:text-[#e8c96d]">
               {link.label}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -516,4 +513,3 @@ function WhatsAppIcon() {
     </svg>
   );
 }
-
