@@ -527,6 +527,33 @@ function Footer() {
   );
 }
 
+function ShippingIcon() {
+  return (
+    <svg aria-hidden="true" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.7">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 7.75h11v9.5H3zM14 10.25h3.8l3.2 3.55v3.45h-7z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M7 19.25a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM17.5 19.25a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" />
+    </svg>
+  );
+}
+
+function ShieldIcon() {
+  return (
+    <svg aria-hidden="true" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.7">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3.25 19.25 6v5.25c0 4.25-2.85 7.95-7.25 9.5-4.4-1.55-7.25-5.25-7.25-9.5V6z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="m8.75 12.1 2.15 2.15 4.65-4.8" />
+    </svg>
+  );
+}
+
+function WhatsAppIcon() {
+  return (
+    <svg aria-hidden="true" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.7">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5.2 19.15 6.35 15.8a7.6 7.6 0 1 1 2.9 2.65z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.35 8.8c.25 3.05 2.15 4.9 5.75 5.85l1.15-1.4-2.05-1.15-.85.8c-1.25-.48-2.13-1.28-2.65-2.4l.88-.92z" />
+    </svg>
+  );
+}
+
 function CartIcon() {
   return (
     <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
