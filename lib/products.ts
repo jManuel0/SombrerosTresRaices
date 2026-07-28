@@ -11,7 +11,7 @@ export const products: Product[] = [
   {
     id: "sombrero-vallenato-colombia",
     name: "Sombrero Vallenato Colombia",
-    category: "Tendencia",
+    category: "Sombrero Vallenato Colombia",
     price: 49999,
     images: [
       "/catalogo/sombrero-vallenato-colombia/imagen1.webp",
@@ -25,7 +25,7 @@ export const products: Product[] = [
   {
     id: "sombrero-vallenato-tradicional",
     name: "Sombrero Vallenato Tradicional",
-    category: "Tradicional",
+    category: "Sombrero Vallenato Tradicional",
     price: 49999,
     images: [
       "/catalogo/sombrero-vallenato-tradicional/imagen1.webp",
@@ -33,6 +33,46 @@ export const products: Product[] = [
       "/catalogo/sombrero-vallenato-tradicional/imagen3.webp",
     ],
     description: "Diseño clásico de la colección Vallenato Tradicional, símbolo de la cultura y el folclor colombiano."
+  },
+  {
+    id: "sombrero-vallenato-2",
+    name: "Sombrero Vallenato 2",
+    category: "Sombrero Vallenato 2",
+    price: 49999,
+    images: [
+      "/catalogo/sombrero-vallenato-2/imagen1.webp",
+      "/catalogo/sombrero-vallenato-2/imagen2.webp",
+      "/catalogo/sombrero-vallenato-2/imagen3.webp",
+      "/catalogo/sombrero-vallenato-2/imagen4.webp",
+      "/catalogo/sombrero-vallenato-2/imagen5.webp",
+      "/catalogo/sombrero-vallenato-2/imagen6.webp",
+    ],
+    description: "Pieza artesanal de la colección Vallenato 2, elaborada a mano con materiales naturales."
+  },
+  {
+    id: "sombrero-vallenato-colombia-3",
+    name: "Sombrero Vallenato Colombia 3",
+    category: "Sombrero Vallenato Colombia 3",
+    price: 49999,
+    images: [
+      "/catalogo/sombrero-vallenato-colombia-3/imagen1.webp",
+      "/catalogo/sombrero-vallenato-colombia-3/imagen2.webp",
+      "/catalogo/sombrero-vallenato-colombia-3/imagen3.webp",
+      "/catalogo/sombrero-vallenato-colombia-3/imagen4.webp",
+    ],
+    description: "Pieza artesanal de la colección Vallenato Colombia 3, elaborada a mano con materiales naturales."
+  },
+  {
+    id: "sombrero-vallenato-colombia-blanco",
+    name: "Sombrero Vallenato Colombia Blanco",
+    category: "Sombrero Vallenato Colombia Blanco",
+    price: 49999,
+    images: [
+      "/catalogo/sombrero-vallenato-colombia-blanco/imagen1.webp",
+      "/catalogo/sombrero-vallenato-colombia-blanco/imagen2.webp",
+      "/catalogo/sombrero-vallenato-colombia-blanco/imagen3.webp",
+    ],
+    description: "Pieza artesanal de la colección Vallenato Colombia Blanco, elaborada a mano con materiales naturales."
   }
 ];
 
