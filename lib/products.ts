@@ -1,3 +1,5 @@
+export type Tag = "mas-vendido" | "destacado" | "tradicional" | "nueva-coleccion";
+
 export type Product = {
   id: string;
   name: string;
@@ -5,6 +7,14 @@ export type Product = {
   price: number;
   images: string[];
   description: string;
+  tags: Tag[];
+};
+
+export const TAG_CONFIG: Record<Tag, { label: string; emoji: string; color: string }> = {
+  "mas-vendido":      { label: "Más vendido",      emoji: "🏆", color: "bg-amber-500 text-white" },
+  "destacado":        { label: "Destacado",         emoji: "⭐", color: "bg-[#b85c38] text-white" },
+  "tradicional":      { label: "Tradicional",       emoji: "🎩", color: "bg-[#173326] text-[#e8c96d]" },
+  "nueva-coleccion":  { label: "Nueva colección",   emoji: "🆕", color: "bg-emerald-600 text-white" },
 };
 
 export const products: Product[] = [
@@ -13,6 +23,7 @@ export const products: Product[] = [
     name: "Sombrero Vallenato Colombia",
     category: "Sombrero Vallenato Colombia",
     price: 49999,
+    tags: ["mas-vendido", "destacado"],
     images: [
       "/catalogo/sombrero-vallenato-colombia/imagen1.webp",
       "/catalogo/sombrero-vallenato-colombia/imagen2.webp",
@@ -27,6 +38,7 @@ export const products: Product[] = [
     name: "Sombrero Vallenato Tradicional",
     category: "Sombrero Vallenato Tradicional",
     price: 49999,
+    tags: ["tradicional"],
     images: [
       "/catalogo/sombrero-vallenato-tradicional/imagen1.webp",
       "/catalogo/sombrero-vallenato-tradicional/imagen2.webp",
@@ -39,6 +51,7 @@ export const products: Product[] = [
     name: "Sombrero Vallenato 2",
     category: "Sombrero Vallenato 2",
     price: 49999,
+    tags: ["destacado"],
     images: [
       "/catalogo/sombrero-vallenato-2/imagen1.webp",
       "/catalogo/sombrero-vallenato-2/imagen2.webp",
@@ -54,6 +67,7 @@ export const products: Product[] = [
     name: "Sombrero Vallenato Colombia 3",
     category: "Sombrero Vallenato Colombia 3",
     price: 49999,
+    tags: ["nueva-coleccion"],
     images: [
       "/catalogo/sombrero-vallenato-colombia-3/imagen1.webp",
       "/catalogo/sombrero-vallenato-colombia-3/imagen2.webp",
@@ -67,6 +81,7 @@ export const products: Product[] = [
     name: "Sombrero Vallenato Colombia Blanco",
     category: "Sombrero Vallenato Colombia Blanco",
     price: 49999,
+    tags: ["nueva-coleccion", "destacado"],
     images: [
       "/catalogo/sombrero-vallenato-colombia-blanco/imagen1.webp",
       "/catalogo/sombrero-vallenato-colombia-blanco/imagen2.webp",
