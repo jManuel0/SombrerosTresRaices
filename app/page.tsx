@@ -281,16 +281,61 @@ function CatalogPreview({ onAddToCart }: { onAddToCart: (product: Product) => vo
 }
 
 function ProductCard({ product, onAddToCart }: { product: Product; onAddToCart: (product: Product) => void }) {
+  const [current, setCurrent] = useState(0);
+
+  const prev = () =>
+    setCurrent((i) => (i - 1 + product.images.length) % product.images.length);
+  const next = () =>
+    setCurrent((i) => (i + 1) % product.images.length);
+
   return (
     <article className="group overflow-hidden rounded-lg border border-[#d9c18e] bg-[#fbf5ea] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
       <div className="relative aspect-[4/5] overflow-hidden bg-[#d8cfb7]">
         <Image
-          src={product.images[0]}
-          alt={product.name}
+          src={product.images[current]}
+          alt={`${product.name} - foto ${current + 1}`}
           fill
           sizes="(min-width: 768px) 33vw, 100vw"
           className="object-cover transition duration-500 group-hover:scale-105"
         />
+
+        {product.images.length > 1 && (
+          <>
+            <button
+              onClick={prev}
+              aria-label="Foto anterior"
+              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-[#14221b]/60 p-2 text-white backdrop-blur-sm transition hover:bg-[#14221b]"
+            >
+              ‹
+            </button>
+            <button
+              onClick={next}
+              aria-label="Foto siguiente"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-[#14221b]/60 p-2 text-white backdrop-blur-sm transition hover:bg-[#14221b]"
+            >
+              ›
+            </button>
+          </>
+        )}
+
+        {product.images.length > 1 && (
+          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+            {product.images.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                aria-label={`Ir a foto ${i + 1}`}
+                className={`h-2 w-2 rounded-full transition ${
+                  i === current ? "bg-white" : "bg-white/40"
+                }`}
+              />
+            ))}
+          </div>
+        )}
+
+        <span className="absolute right-3 top-3 rounded-full bg-[#14221b]/60 px-2 py-0.5 text-xs text-white backdrop-blur-sm">
+          {current + 1} / {product.images.length}
+        </span>
       </div>
       <div className="p-6">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#b85c38]">{product.category}</p>
