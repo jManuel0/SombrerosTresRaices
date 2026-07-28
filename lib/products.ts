@@ -8,53 +8,72 @@ export type Product = {
 };
 
 export const products: Product[] = [
+  // Colección: Sombrero Vallenato Colombia
   {
-    id: "aguadeno-clasico",
-    name: "Sombrero Aguadeño Clásico",
-    category: "Tradicional",
-    price: 189000,
-    image: "https://picsum.photos/seed/tres-raices-aguadeno/720/840",
-    description: "Una pieza liviana y sobria para uso diario, viajes y ocasiones especiales."
+    id: "sombrero-vallenato-colombia-1",
+    name: "Sombrero Vallenato Colombia",
+    category: "Sombrero Vallenato Colombia",
+    price: 49999,
+    image: "/catalogo/sombrero-vallenato-colombia/imagen1.webp",
+    description: "Pieza artesanal de la colección Vallenato Colombia, elaborada a mano con materiales naturales."
   },
   {
-    id: "vueltiao-dorado",
-    name: "Sombrero Vueltiao Dorado",
-    category: "Ceremonial",
-    price: 245000,
-    image: "https://picsum.photos/seed/tres-raices-vueltiao/720/840",
-    description: "Diseño con presencia artesanal, ideal para celebraciones y regalos memorables."
+    id: "sombrero-vallenato-colombia-2",
+    name: "Sombrero Vallenato Colombia",
+    category: "Sombrero Vallenato Colombia",
+    price: 49999,
+    image: "/catalogo/sombrero-vallenato-colombia/imagen2.webp",
+    description: "Pieza artesanal de la colección Vallenato Colombia, elaborada a mano con materiales naturales."
   },
   {
-    id: "fedora-arcilla",
-    name: "Fedora Artesanal Arcilla",
-    category: "Urbano",
-    price: 215000,
-    image: "https://picsum.photos/seed/tres-raices-fedora/720/840",
-    description: "Silueta contemporánea con acabado cálido para vestir con elegancia."
+    id: "sombrero-vallenato-colombia-3",
+    name: "Sombrero Vallenato Colombia",
+    category: "Sombrero Vallenato Colombia",
+    price: 49999,
+    image: "/catalogo/sombrero-vallenato-colombia/imagen3.webp",
+    description: "Pieza artesanal de la colección Vallenato Colombia, elaborada a mano con materiales naturales."
   },
   {
-    id: "panama-cafe",
-    name: "Sombrero Panamá Café",
-    category: "Urbano",
-    price: 229000,
-    image: "https://picsum.photos/seed/tres-raices-panama/720/840",
-    description: "Perfil fresco y refinado para clima cálido y looks de ciudad."
+    id: "sombrero-vallenato-colombia-4",
+    name: "Sombrero Vallenato Colombia",
+    category: "Sombrero Vallenato Colombia",
+    price: 49999,
+    image: "/catalogo/sombrero-vallenato-colombia/imagen4.webp",
+    description: "Pieza artesanal de la colección Vallenato Colombia, elaborada a mano con materiales naturales."
   },
   {
-    id: "campesino-natural",
-    name: "Sombrero Campesino Natural",
-    category: "Tradicional",
-    price: 159000,
-    image: "https://picsum.photos/seed/tres-raices-campesino/720/840",
-    description: "Inspirado en la tradición rural colombiana, resistente y de uso versátil."
+    id: "sombrero-vallenato-colombia-5",
+    name: "Sombrero Vallenato Colombia",
+    category: "Sombrero Vallenato Colombia",
+    price: 49999,
+    image: "/catalogo/sombrero-vallenato-colombia/imagen5.webp",
+    description: "Pieza artesanal de la colección Vallenato Colombia, elaborada a mano con materiales naturales."
+  },
+
+  // Colección: Sombrero Vallenato Tradicional
+  {
+    id: "sombrero-vallenato-tradicional-1",
+    name: "Sombrero Vallenato Tradicional",
+    category: "Sombrero Vallenato Tradicional",
+    price: 49999,
+    image: "/catalogo/sombrero-vallenato-tradicional/imagen1.webp",
+    description: "Diseño clásico de la colección Vallenato Tradicional, símbolo de la cultura y el folclor colombiano."
   },
   {
-    id: "ala-ancha-oro",
-    name: "Sombrero Ala Ancha Oro",
-    category: "Ceremonial",
-    price: 269000,
-    image: "https://picsum.photos/seed/tres-raices-ala-ancha/720/840",
-    description: "Una pieza de alto impacto para eventos, fotografía y ocasiones importantes."
+    id: "sombrero-vallenato-tradicional-2",
+    name: "Sombrero Vallenato Tradicional",
+    category: "Sombrero Vallenato Tradicional",
+    price: 49999,
+    image: "/catalogo/sombrero-vallenato-tradicional/imagen2.webp",
+    description: "Diseño clásico de la colección Vallenato Tradicional, símbolo de la cultura y el folclor colombiano."
+  },
+  {
+    id: "sombrero-vallenato-tradicional-3",
+    name: "Sombrero Vallenato Tradicional",
+    category: "Sombrero Vallenato Tradicional",
+    price: 49999,
+    image: "/catalogo/sombrero-vallenato-tradicional/imagen3.webp",
+    description: "Diseño clásico de la colección Vallenato Tradicional, símbolo de la cultura y el folclor colombiano."
   }
 ];
 
