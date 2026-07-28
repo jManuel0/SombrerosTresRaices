@@ -285,7 +285,7 @@ function ProductCard({ product, onAddToCart }: { product: Product; onAddToCart: 
     <article className="group overflow-hidden rounded-lg border border-[#d9c18e] bg-[#fbf5ea] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
       <div className="relative aspect-[4/5] overflow-hidden bg-[#d8cfb7]">
         <Image
-          src={product.image}
+          src={product.images[0]}
           alt={product.name}
           fill
           sizes="(min-width: 768px) 33vw, 100vw"
