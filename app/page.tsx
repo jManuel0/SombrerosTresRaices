@@ -73,7 +73,7 @@ export default function Home() {
 
   function addToCart(product: Product) {
     setCartItems((currentItems) => {
-      const existingItem = currentItems.find((item) => item.id === product.id);
+      const existingItem = currentItems.some((item) => item.id === product.id);
 
       if (existingItem) {
         return currentItems.map((item) =>
