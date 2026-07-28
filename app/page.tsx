@@ -157,10 +157,10 @@ function Navbar({
           <button
             type="button"
             aria-label="Abrir carrito"
-            className="relative flex h-11 w-11 items-center justify-center rounded-full border border-[#c49a3a] bg-[#fffaf1] text-[#173326] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#b85c38] hover:text-white"
+            className="relative flex h-11 w-11 items-center justify-center rounded-full border border-[#c49a3a] bg-[#fffaf1] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#b85c38]"
             onClick={onCartOpen}
           >
-            <CartIcon />
+            <Image src="/icons/carrito.svg" alt="Carrito" width={22} height={22} className="transition group-hover:brightness-0 group-hover:invert" />
             {cartCount > 0 ? (
               <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#b85c38] px-1 text-xs font-bold text-white">
                 {cartCount}
@@ -468,9 +468,9 @@ function FloatingWhatsApp() {
     <a
       href={createWhatsAppUrl("Hola, quiero información sobre los sombreros artesanales de Sombreros Tres Raices.")}
       aria-label="Contactar por WhatsApp"
-      className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#1f7a4d] text-white shadow-[0_12px_30px_rgba(15,29,23,0.32)] transition hover:-translate-y-1 hover:bg-[#173326]"
+      className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#1f7a4d] shadow-[0_12px_30px_rgba(15,29,23,0.32)] transition hover:-translate-y-1 hover:bg-[#173326]"
     >
-      <WhatsAppIcon />
+      <Image src="/icons/whatsapp.svg" alt="WhatsApp" width={28} height={28} />
     </a>
   );
 }
@@ -492,12 +492,36 @@ function Footer() {
           ))}
         </div>
 
-        <a
-          href={createWhatsAppUrl("Hola, quiero información sobre Sombreros Tres Raices.")}
-          className="text-sm font-semibold text-[#e8c96d]"
-        >
-          WhatsApp: +57 310 401 0930
-        </a>
+        {/* Redes sociales y WhatsApp */}
+        <div className="flex items-center gap-4">
+          <a
+            href="https://www.facebook.com/share/1BweGm7wmX/?mibextid=wwXIfr"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fffaf1]/10 transition hover:bg-[#fffaf1]/25"
+          >
+            <Image src="/icons/facebook.svg" alt="Facebook" width={22} height={22} />
+          </a>
+          <a
+            href="https://www.instagram.com/tresraicessombreros?igsh=Z3IzcnIycnhuNzYx"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fffaf1]/10 transition hover:bg-[#fffaf1]/25"
+          >
+            <Image src="/icons/instagram.svg" alt="Instagram" width={22} height={22} />
+          </a>
+          <a
+            href={createWhatsAppUrl("Hola, quiero información sobre Sombreros Tres Raices.")}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WhatsApp"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fffaf1]/10 transition hover:bg-[#fffaf1]/25"
+          >
+            <Image src="/icons/whatsapp.svg" alt="WhatsApp" width={22} height={22} />
+          </a>
+        </div>
       </div>
     </footer>
   );
@@ -532,29 +556,4 @@ function CloseIcon() {
   );
 }
 
-function ShippingIcon() {
-  return (
-    <svg aria-hidden="true" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.7">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3 7.75h11v9.5H3zM14 10.25h3.8l3.2 3.55v3.45h-7z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M7 19.25a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM17.5 19.25a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" />
-    </svg>
-  );
-}
 
-function ShieldIcon() {
-  return (
-    <svg aria-hidden="true" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.7">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3.25 19.25 6v5.25c0 4.25-2.85 7.95-7.25 9.5-4.4-1.55-7.25-5.25-7.25-9.5V6z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="m8.75 12.1 2.15 2.15 4.65-4.8" />
-    </svg>
-  );
-}
-
-function WhatsAppIcon() {
-  return (
-    <svg aria-hidden="true" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.7">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5.2 19.15 6.35 15.8a7.6 7.6 0 1 1 2.9 2.65z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9.35 8.8c.25 3.05 2.15 4.9 5.75 5.85l1.15-1.4-2.05-1.15-.85.8c-1.25-.48-2.13-1.28-2.65-2.4l.88-.92z" />
-    </svg>
-  );
-}
