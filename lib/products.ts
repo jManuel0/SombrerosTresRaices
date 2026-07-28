@@ -11,7 +11,7 @@ export const products: Product[] = [
   {
     id: "sombrero-vallenato-colombia",
     name: "Sombrero Vallenato Colombia",
-    category: "Sombrero Vallenato Colombia",
+    category: "Tendencia",
     price: 49999,
     images: [
       "/catalogo/sombrero-vallenato-colombia/imagen1.webp",
@@ -25,7 +25,7 @@ export const products: Product[] = [
   {
     id: "sombrero-vallenato-tradicional",
     name: "Sombrero Vallenato Tradicional",
-    category: "Sombrero Vallenato Tradicional",
+    category: "Tradicional",
     price: 49999,
     images: [
       "/catalogo/sombrero-vallenato-tradicional/imagen1.webp",
