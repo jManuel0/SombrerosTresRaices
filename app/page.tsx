@@ -131,13 +131,13 @@ function Navbar({
   onCartOpen,
   onMenuClose,
   onMenuToggle
-}: {
+}: Readonly<{
   cartCount: number;
   isMenuOpen: boolean;
   onCartOpen: () => void;
   onMenuClose: () => void;
   onMenuToggle: () => void;
-}) {
+}>) {
   return (
     <header className="sticky top-0 z-50 border-b border-[#d9c18e]/60 bg-[#fbf5ea]/90 backdrop-blur">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
@@ -245,7 +245,7 @@ function Hero() {
   );
 }
 
-function CatalogPreview({ onAddToCart }: { onAddToCart: (product: Product) => void }) {
+function CatalogPreview({ onAddToCart }: Readonly<{ onAddToCart: (product: Product) => void }>) {
   return (
     <section id="catalogo" className="bg-[#fffaf1] px-5 py-20 sm:px-8 lg:py-24">
       <div className="mx-auto max-w-7xl">
@@ -280,7 +280,7 @@ function CatalogPreview({ onAddToCart }: { onAddToCart: (product: Product) => vo
   );
 }
 
-function ProductCard({ product, onAddToCart }: { product: Product; onAddToCart: (product: Product) => void }) {
+function ProductCard({ product, onAddToCart }: Readonly<{ product: Product; onAddToCart: (product: Product) => void }>) {
   const [current, setCurrent] = useState(0);
 
   const prev = () =>
@@ -382,7 +382,7 @@ function CartPanel({
   onClear,
   onClose,
   onRemove
-}: {
+}: Readonly<{
   cartItems: CartItem[];
   cartTotal: number;
   isOpen: boolean;
@@ -390,7 +390,7 @@ function CartPanel({
   onClear: () => void;
   onClose: () => void;
   onRemove: (productId: string) => void;
-}) {
+}>) {
   if (!isOpen) {
     return null;
   }
