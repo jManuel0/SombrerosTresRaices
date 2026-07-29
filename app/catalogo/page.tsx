@@ -6,6 +6,7 @@ import { useState } from "react";
 import { products, TAG_CONFIG } from "@/lib/products";
 import type { Tag } from "@/lib/products";
 import { createWhatsAppUrl, formatPrice } from "@/lib/shop";
+import { useTheme } from "@/app/theme-provider";
 
 type Filter = "todos" | Tag;
 
@@ -80,6 +81,7 @@ function ProductCard({ product }: { product: (typeof products)[0] }) {
 
 export default function CatalogPage() {
   const [activeFilter, setActiveFilter] = useState<Filter>("todos");
+  const { theme, toggle } = useTheme();
 
   const filtered = activeFilter === "todos"
     ? products
@@ -94,9 +96,20 @@ export default function CatalogPage() {
             <Image src="/logo.webp" alt="Sombreros Tres Raices" width={40} height={40} className="rounded-full object-cover" />
             <span className="font-serif text-xl font-bold tracking-wide text-brand-green">Sombreros Tres Raices</span>
           </Link>
-          <Link href="/" className="rounded-full border border-theme px-5 py-2 text-xs font-bold uppercase tracking-[0.16em] text-theme-primary transition hover:bg-brand-green hover:text-theme-light hover:border-brand-green">
-            Volver
-          </Link>
+          <div className="flex items-center gap-3">
+            {/* Botón modo oscuro/claro */}
+            <button
+              type="button"
+              aria-label={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+              onClick={toggle}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-theme bg-theme-surface text-theme-primary transition hover:bg-theme-muted"
+            >
+              {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+            </button>
+            <Link href="/" className="rounded-full border border-theme px-5 py-2 text-xs font-bold uppercase tracking-[0.16em] text-theme-primary transition hover:bg-brand-green hover:text-theme-light hover:border-brand-green">
+              Volver
+            </Link>
+          </div>
         </nav>
       </header>
 
@@ -161,5 +174,22 @@ export default function CatalogPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="12" cy="12" r="4" />
+      <path strokeLinecap="round" d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" />
+    </svg>
   );
 }

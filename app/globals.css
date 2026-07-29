@@ -2,62 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Variables de color ──────────────────────────────────────────────────── */
+/* ─── Variables modo claro ────────────────────────────────────────────────── */
 :root {
-  /* Fondos */
   --bg-base:       #fbf5ea;
   --bg-surface:    #fffaf1;
   --bg-muted:      #e8dcc6;
   --bg-card:       #fbf5ea;
   --bg-dark:       #0f1d17;
+  --nav-bg:        rgba(251,245,234,0.92);
 
-  /* Texto */
   --text-primary:  #14221b;
   --text-secondary:#315c48;
   --text-muted:    #d9c18e;
   --text-light:    #fffaf1;
 
-  /* Marca */
   --brand-green:   #173326;
-  --brand-green-2: #315c48;
   --brand-gold:    #c49a3a;
   --brand-gold-2:  #e8c96d;
   --brand-terra:   #b85c38;
   --brand-border:  #d9c18e;
-
-  /* Navbar */
-  --nav-bg:        rgba(251,245,234,0.92);
+  --brand-border-muted: rgba(217,193,142,0.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Fondos */
-    --bg-base:       #111a14;
-    --bg-surface:    #18231b;
-    --bg-muted:      #1e2d22;
-    --bg-card:       #1a2a1e;
-    --bg-dark:       #0a100c;
+/* ─── Variables modo oscuro ───────────────────────────────────────────────── */
+.dark {
+  --bg-base:       #111a14;
+  --bg-surface:    #18231b;
+  --bg-muted:      #1e2d22;
+  --bg-card:       #1a2a1e;
+  --bg-dark:       #0a100c;
+  --nav-bg:        rgba(17,26,20,0.92);
 
-    /* Texto */
-    --text-primary:  #f0e8d5;
-    --text-secondary:#a8c4a8;
-    --text-muted:    #8a7a50;
-    --text-light:    #f0e8d5;
+  --text-primary:  #f0e8d5;
+  --text-secondary:#a8c4a8;
+  --text-muted:    #8a7a50;
+  --text-light:    #f0e8d5;
 
-    /* Marca — se mantienen pero ligeramente más brillantes */
-    --brand-green:   #2a5040;
-    --brand-green-2: #4a8a60;
-    --brand-gold:    #d4a84a;
-    --brand-gold-2:  #f0d87a;
-    --brand-terra:   #cc6a40;
-    --brand-border:  #3a4a35;
-
-    /* Navbar */
-    --nav-bg:        rgba(17,26,20,0.92);
-  }
+  --brand-green:   #2a5040;
+  --brand-gold:    #d4a84a;
+  --brand-gold-2:  #f0d87a;
+  --brand-terra:   #cc6a40;
+  --brand-border:  #3a4a35;
+  --brand-border-muted: rgba(58,74,53,0.6);
 }
 
-/* ─── Aplicar variables al body ──────────────────────────────────────────── */
+/* ─── Base ────────────────────────────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
+
 body {
   margin: 0;
   background-color: var(--bg-base);
@@ -65,11 +56,7 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-/* ─── Clases utilitarias con variables ───────────────────────────────────── */
+/* ─── Clases utilitarias ─────────────────────────────────────────────────── */
 @layer utilities {
   .bg-theme-base    { background-color: var(--bg-base); }
   .bg-theme-surface { background-color: var(--bg-surface); }
@@ -92,6 +79,6 @@ html {
   .bg-brand-terra  { background-color: var(--brand-terra); }
   .bg-brand-muted  { background-color: var(--bg-muted); }
 
-  .border-theme     { border-color: var(--brand-border); }
-  .border-theme-muted { border-color: color-mix(in srgb, var(--brand-border) 60%, transparent); }
+  .border-theme       { border-color: var(--brand-border); }
+  .border-theme-muted { border-color: var(--brand-border-muted); }
 }

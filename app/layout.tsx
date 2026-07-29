@@ -1,5 +1,6 @@
 ﻿import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { ThemeProvider } from "./theme-provider";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sombreros-tres-raices.vercel.app";
@@ -38,8 +39,10 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <body>{children}</body>
+    <html lang="es" suppressHydrationWarning>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

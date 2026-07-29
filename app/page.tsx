@@ -9,6 +9,7 @@ import type { Product } from "@/lib/products";
 import { TAG_CONFIG } from "@/lib/products";
 import { cartStorageKey, createCartMessage, createWhatsAppUrl, formatPrice } from "@/lib/shop";
 import type { CartItem } from "@/lib/shop";
+import { useTheme } from "./theme-provider";
 
 type TrustItem = {
   title: string;
@@ -100,6 +101,8 @@ export default function Home() {
 function Navbar({ cartCount, isMenuOpen, onCartOpen, onMenuClose, onMenuToggle }: Readonly<{
   cartCount: number; isMenuOpen: boolean; onCartOpen: () => void; onMenuClose: () => void; onMenuToggle: () => void;
 }>) {
+  const { theme, toggle } = useTheme();
+
   return (
     <header className="sticky top-0 z-50 border-b border-theme-muted bg-nav backdrop-blur">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
@@ -115,6 +118,16 @@ function Navbar({ cartCount, isMenuOpen, onCartOpen, onMenuClose, onMenuToggle }
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Botón modo oscuro/claro */}
+          <button
+            type="button"
+            aria-label={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+            onClick={toggle}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-theme bg-theme-surface text-theme-primary shadow-sm transition hover:-translate-y-0.5 hover:bg-theme-muted"
+          >
+            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+          </button>
+
           <button type="button" aria-label="Abrir carrito"
             className="relative flex h-11 w-11 items-center justify-center rounded-full border border-theme bg-theme-surface shadow-sm transition hover:-translate-y-0.5 hover:bg-brand-terra"
             onClick={onCartOpen}
@@ -457,6 +470,23 @@ function CloseIcon() {
   return (
     <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.9">
       <path strokeLinecap="round" strokeLinejoin="round" d="m6 6 12 12M18 6 6 18" />
+    </svg>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="12" cy="12" r="4" />
+      <path strokeLinecap="round" d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" />
     </svg>
   );
 }
