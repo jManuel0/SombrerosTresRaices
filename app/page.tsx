@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { featuredProducts } from "@/lib/products";
 import type { Product } from "@/lib/products";
+import { TAG_CONFIG } from "@/lib/products";
 import { cartStorageKey, createCartMessage, createWhatsAppUrl, formatPrice } from "@/lib/shop";
 import type { CartItem } from "@/lib/shop";
 
@@ -48,10 +49,7 @@ export default function Home() {
   useEffect(() => {
     try {
       const savedCart = window.localStorage.getItem(cartStorageKey);
-
-      if (savedCart) {
-        setCartItems(JSON.parse(savedCart) as CartItem[]);
-      }
+      if (savedCart) setCartItems(JSON.parse(savedCart) as CartItem[]);
     } catch {
       window.localStorage.removeItem(cartStorageKey);
     } finally {
@@ -60,10 +58,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!hasLoadedCart) {
-      return;
-    }
-
+    if (!hasLoadedCart) return;
     window.localStorage.setItem(cartStorageKey, JSON.stringify(cartItems));
   }, [cartItems, hasLoadedCart]);
 
@@ -72,108 +67,67 @@ export default function Home() {
   const cartMessage = useMemo(() => createCartMessage(cartItems, cartTotal), [cartItems, cartTotal]);
 
   function addToCart(product: Product) {
-    setCartItems((currentItems) => {
-      const existingItem = currentItems.some((item) => item.id === product.id);
-
-      if (existingItem) {
-        return currentItems.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-
-      return [...currentItems, { ...product, quantity: 1 }];
+    setCartItems((current) => {
+      const exists = current.some((item) => item.id === product.id);
+      if (exists) return current.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+      return [...current, { ...product, quantity: 1 }];
     });
     setIsCartOpen(true);
   }
 
   function removeFromCart(productId: string) {
-    setCartItems((currentItems) =>
-      currentItems
-        .map((item) => (item.id === productId ? { ...item, quantity: item.quantity - 1 } : item))
-        .filter((item) => item.quantity > 0)
+    setCartItems((current) =>
+      current.map((item) => item.id === productId ? { ...item, quantity: item.quantity - 1 } : item)
+             .filter((item) => item.quantity > 0)
     );
   }
 
-  function clearCart() {
-    setCartItems([]);
-  }
+  function clearCart() { setCartItems([]); }
 
   return (
-    <main className="min-h-screen bg-[#fbf5ea] text-[#14221b]">
-      <Navbar
-        cartCount={cartCount}
-        isMenuOpen={isMenuOpen}
-        onCartOpen={() => setIsCartOpen(true)}
-        onMenuClose={() => setIsMenuOpen(false)}
-        onMenuToggle={() => setIsMenuOpen((isOpen) => !isOpen)}
-      />
+    <main className="min-h-screen bg-theme-base text-theme-primary">
+      <Navbar cartCount={cartCount} isMenuOpen={isMenuOpen} onCartOpen={() => setIsCartOpen(true)} onMenuClose={() => setIsMenuOpen(false)} onMenuToggle={() => setIsMenuOpen((o) => !o)} />
       <Hero />
       <CatalogPreview onAddToCart={addToCart} />
       <TrustSection />
       <Footer />
-      <CartPanel
-        cartItems={cartItems}
-        cartTotal={cartTotal}
-        isOpen={isCartOpen}
-        message={cartMessage}
-        onClear={clearCart}
-        onClose={() => setIsCartOpen(false)}
-        onRemove={removeFromCart}
-      />
+      <CartPanel cartItems={cartItems} cartTotal={cartTotal} isOpen={isCartOpen} message={cartMessage} onClear={clearCart} onClose={() => setIsCartOpen(false)} onRemove={removeFromCart} />
       <FloatingWhatsApp />
     </main>
   );
 }
 
-function Navbar({
-  cartCount,
-  isMenuOpen,
-  onCartOpen,
-  onMenuClose,
-  onMenuToggle
-}: Readonly<{
-  cartCount: number;
-  isMenuOpen: boolean;
-  onCartOpen: () => void;
-  onMenuClose: () => void;
-  onMenuToggle: () => void;
+function Navbar({ cartCount, isMenuOpen, onCartOpen, onMenuClose, onMenuToggle }: Readonly<{
+  cartCount: number; isMenuOpen: boolean; onCartOpen: () => void; onMenuClose: () => void; onMenuToggle: () => void;
 }>) {
   return (
-    <header className="sticky top-0 z-50 border-b border-[#d9c18e]/60 bg-[#fbf5ea]/90 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-theme-muted bg-nav backdrop-blur">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
         <Link href="/" className="flex items-center gap-2" onClick={onMenuClose}>
           <Image src="/logo.webp" alt="Sombreros Tres Raices" width={44} height={44} className="rounded-full object-cover" />
-          <span className="font-serif text-xl font-bold tracking-wide text-[#173326]">Sombreros Tres Raices</span>
+          <span className="font-serif text-xl font-bold tracking-wide text-brand-green">Sombreros Tres Raices</span>
         </Link>
 
-        <div className="hidden items-center gap-8 text-sm font-medium uppercase tracking-[0.18em] text-[#315c48] md:flex">
+        <div className="hidden items-center gap-8 text-sm font-medium uppercase tracking-[0.18em] text-theme-secondary md:flex">
           {navLinks.map((link) => (
-            <Link key={link.label} href={link.href} className="transition hover:text-[#b85c38]">
-              {link.label}
-            </Link>
+            <Link key={link.label} href={link.href} className="transition hover:text-brand-terra">{link.label}</Link>
           ))}
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            aria-label="Abrir carrito"
-            className="relative flex h-11 w-11 items-center justify-center rounded-full border border-[#c49a3a] bg-[#fffaf1] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#b85c38]"
+          <button type="button" aria-label="Abrir carrito"
+            className="relative flex h-11 w-11 items-center justify-center rounded-full border border-theme bg-theme-surface shadow-sm transition hover:-translate-y-0.5 hover:bg-brand-terra"
             onClick={onCartOpen}
           >
-            <Image src="/icons/carrito.svg" alt="Carrito" width={22} height={22} className="transition group-hover:brightness-0 group-hover:invert" />
-            {cartCount > 0 ? (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#b85c38] px-1 text-xs font-bold text-white">
+            <Image src="/icons/carrito.svg" alt="Carrito" width={22} height={22} className="dark:invert" />
+            {cartCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-terra px-1 text-xs font-bold text-white">
                 {cartCount}
               </span>
-            ) : null}
+            )}
           </button>
-
-          <button
-            type="button"
-            aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
-            aria-expanded={isMenuOpen}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-[#d9c18e] bg-[#173326] text-[#fffaf1] md:hidden"
+          <button type="button" aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"} aria-expanded={isMenuOpen}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-theme bg-brand-green text-theme-light md:hidden"
             onClick={onMenuToggle}
           >
             {isMenuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -181,14 +135,12 @@ function Navbar({
         </div>
       </nav>
 
-      {isMenuOpen ? (
-        <div className="border-t border-[#d9c18e]/60 bg-[#fffaf1] px-5 py-5 shadow-lg md:hidden">
+      {isMenuOpen && (
+        <div className="border-t border-theme-muted bg-theme-surface px-5 py-5 shadow-lg md:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-3">
             {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="rounded-md px-3 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#173326] transition hover:bg-[#e8dcc6]"
+              <Link key={link.label} href={link.href}
+                className="rounded-md px-3 py-3 text-sm font-bold uppercase tracking-[0.16em] text-theme-primary transition hover:bg-theme-muted"
                 onClick={onMenuClose}
               >
                 {link.label}
@@ -196,7 +148,7 @@ function Navbar({
             ))}
           </div>
         </div>
-      ) : null}
+      )}
     </header>
   );
 }
@@ -204,28 +156,14 @@ function Navbar({
 function Hero() {
   return (
     <section className="relative isolate overflow-hidden">
-      <Image
-        src="https://picsum.photos/seed/sombreros-tres-raices-hero/1800/1100"
-        alt="Sombrero artesanal colombiano sobre una mesa de taller"
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover"
-      />
+      <Image src="https://picsum.photos/seed/sombreros-tres-raices-hero/1800/1100" alt="Sombrero artesanal colombiano sobre una mesa de taller" fill priority sizes="100vw" className="object-cover" />
       <div className="absolute inset-0 bg-gradient-to-r from-[#0f1d17]/90 via-[#173326]/68 to-[#6f3927]/20" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_22%,rgba(196,154,58,0.36),transparent_34%),linear-gradient(135deg,rgba(184,92,56,0.25)_0%,rgba(251,245,234,0)_48%,rgba(20,34,27,0.30)_100%)]" />
 
       <div className="relative mx-auto flex min-h-[76vh] max-w-7xl items-center px-5 pb-16 pt-20 sm:px-8 lg:min-h-[82vh]">
         <div className="max-w-3xl text-[#fffaf1]">
-          {/* Logo sello en el hero */}
           <div className="mb-6 flex items-center gap-3">
-            <Image
-              src="/logo.webp"
-              alt="Sombreros Tres Raices"
-              width={64}
-              height={64}
-              className="rounded-full border-2 border-[#c49a3a]/60 object-cover shadow-lg"
-            />
+            <Image src="/logo.webp" alt="Sombreros Tres Raices" width={64} height={64} className="rounded-full border-2 border-[#c49a3a]/60 object-cover shadow-lg" />
           </div>
           <p className="mb-5 inline-flex border-l-2 border-[#c49a3a] pl-4 text-sm font-semibold uppercase tracking-[0.24em] text-[#e8c96d] sm:tracking-[0.28em]">
             Hechos a mano en Colombia
@@ -237,16 +175,10 @@ function Hero() {
             Piezas artesanales con fibra natural, presencia elegante y el carácter cálido de la tradición colombiana.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/catalogo"
-              className="inline-flex items-center justify-center rounded-full bg-[#c49a3a] px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] text-[#102018] shadow-[0_18px_45px_rgba(16,32,24,0.38)] transition hover:-translate-y-1 hover:bg-[#e8c96d]"
-            >
+            <Link href="/catalogo" className="inline-flex items-center justify-center rounded-full bg-[#c49a3a] px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] text-[#102018] shadow-[0_18px_45px_rgba(16,32,24,0.38)] transition hover:-translate-y-1 hover:bg-[#e8c96d]">
               Ver catálogo
             </Link>
-            <a
-              href={createWhatsAppUrl("Hola, quiero asesoría para elegir un sombrero artesanal.")}
-              className="inline-flex items-center justify-center rounded-full border border-[#fffaf1]/70 px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] text-[#fffaf1] transition hover:-translate-y-1 hover:bg-[#fffaf1] hover:text-[#173326]"
-            >
+            <a href={createWhatsAppUrl("Hola, quiero asesoría para elegir un sombrero artesanal.")} className="inline-flex items-center justify-center rounded-full border border-[#fffaf1]/70 px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] text-[#fffaf1] transition hover:-translate-y-1 hover:bg-[#fffaf1] hover:text-[#173326]">
               Hablar por WhatsApp
             </a>
           </div>
@@ -258,16 +190,14 @@ function Hero() {
 
 function CatalogPreview({ onAddToCart }: Readonly<{ onAddToCart: (product: Product) => void }>) {
   return (
-    <section id="catalogo" className="bg-[#fffaf1] px-5 py-20 sm:px-8 lg:py-24">
+    <section id="catalogo" className="bg-theme-surface px-5 py-20 sm:px-8 lg:py-24">
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#b85c38]">Catálogo</p>
-            <h2 className="mt-3 font-serif text-4xl font-bold text-[#14221b] sm:text-5xl">
-              Selección destacada
-            </h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-terra">Catálogo</p>
+            <h2 className="mt-3 font-serif text-4xl font-bold text-theme-primary sm:text-5xl">Selección destacada</h2>
           </div>
-          <p className="max-w-xl text-base leading-7 text-[#315c48]">
+          <p className="max-w-xl text-base leading-7 text-theme-secondary">
             Tres siluetas pensadas para ciudad, viaje y celebraciones. Cada sombrero combina presencia, comodidad y oficio artesanal.
           </p>
         </div>
@@ -279,10 +209,7 @@ function CatalogPreview({ onAddToCart }: Readonly<{ onAddToCart: (product: Produ
         </div>
 
         <div className="mt-10 text-center">
-          <Link
-            href="/catalogo"
-            className="inline-flex items-center justify-center rounded-full border border-[#173326] px-7 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#173326] transition hover:bg-[#173326] hover:text-[#fffaf1]"
-          >
+          <Link href="/catalogo" className="inline-flex items-center justify-center rounded-full border border-theme bg-transparent px-7 py-3 text-sm font-bold uppercase tracking-[0.16em] text-theme-primary transition hover:bg-brand-green hover:text-theme-light hover:border-brand-green">
             Ver todos los sombreros
           </Link>
         </div>
@@ -293,69 +220,51 @@ function CatalogPreview({ onAddToCart }: Readonly<{ onAddToCart: (product: Produ
 
 function ProductCard({ product, onAddToCart }: Readonly<{ product: Product; onAddToCart: (product: Product) => void }>) {
   const [current, setCurrent] = useState(0);
-
-  const prev = () =>
-    setCurrent((i) => (i - 1 + product.images.length) % product.images.length);
-  const next = () =>
-    setCurrent((i) => (i + 1) % product.images.length);
+  const prev = () => setCurrent((i) => (i - 1 + product.images.length) % product.images.length);
+  const next = () => setCurrent((i) => (i + 1) % product.images.length);
 
   return (
-    <article className="group overflow-hidden rounded-lg border border-[#d9c18e] bg-[#fbf5ea] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-      <div className="relative aspect-[4/5] overflow-hidden bg-[#d8cfb7]">
-        <Image
-          src={product.images[current]}
-          alt={`${product.name} - foto ${current + 1}`}
-          fill
-          sizes="(min-width: 768px) 33vw, 100vw"
-          className="object-cover transition duration-500 group-hover:scale-105"
-        />
+    <article className="group overflow-hidden rounded-lg border border-theme bg-theme-card shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <div className="relative aspect-[4/5] overflow-hidden bg-theme-muted">
+        <Image src={product.images[current]} alt={`${product.name} - foto ${current + 1}`} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition duration-500 group-hover:scale-105" />
 
-        {product.images.length > 1 && (
-          <>
-            <button
-              onClick={prev}
-              aria-label="Foto anterior"
-              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-[#14221b]/60 p-2 text-white backdrop-blur-sm transition hover:bg-[#14221b]"
-            >
-              ‹
-            </button>
-            <button
-              onClick={next}
-              aria-label="Foto siguiente"
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-[#14221b]/60 p-2 text-white backdrop-blur-sm transition hover:bg-[#14221b]"
-            >
-              ›
-            </button>
-          </>
-        )}
-
-        {product.images.length > 1 && (
-          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-            {product.images.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrent(i)}
-                aria-label={`Ir a foto ${i + 1}`}
-                className={`h-2 w-2 rounded-full transition ${
-                  i === current ? "bg-white" : "bg-white/40"
-                }`}
-              />
-            ))}
+        {/* Badges */}
+        {product.tags.length > 0 && (
+          <div className="absolute left-3 top-3 flex flex-col gap-1.5">
+            {product.tags.map((tag) => {
+              const cfg = TAG_CONFIG[tag];
+              return (
+                <span key={tag} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold shadow-md ${cfg.color}`}>
+                  <span>{cfg.emoji}</span><span>{cfg.label}</span>
+                </span>
+              );
+            })}
           </div>
         )}
 
-        <span className="absolute right-3 top-3 rounded-full bg-[#14221b]/60 px-2 py-0.5 text-xs text-white backdrop-blur-sm">
-          {current + 1} / {product.images.length}
-        </span>
+        {product.images.length > 1 && (
+          <>
+            <button onClick={prev} aria-label="Foto anterior" className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition hover:bg-black/80">‹</button>
+            <button onClick={next} aria-label="Foto siguiente" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition hover:bg-black/80">›</button>
+          </>
+        )}
+        {product.images.length > 1 && (
+          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+            {product.images.map((_, i) => (
+              <button key={i} onClick={() => setCurrent(i)} aria-label={`Ir a foto ${i + 1}`} className={`h-2 w-2 rounded-full transition ${i === current ? "bg-white" : "bg-white/40"}`} />
+            ))}
+          </div>
+        )}
+        <span className="absolute right-3 top-3 rounded-full bg-black/50 px-2 py-0.5 text-xs text-white backdrop-blur-sm">{current + 1} / {product.images.length}</span>
       </div>
+
       <div className="p-6">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#b85c38]">{product.category}</p>
-        <h3 className="mt-2 font-serif text-2xl font-bold text-[#14221b]">{product.name}</h3>
-        <p className="mt-3 text-sm leading-6 text-[#315c48]">{product.description}</p>
-        <p className="mt-4 text-lg font-semibold text-[#b85c38]">{formatPrice(product.price)}</p>
-        <button
-          type="button"
-          className="mt-6 w-full rounded-full border border-[#173326] bg-[#173326] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-[#fffaf1] transition hover:border-[#b85c38] hover:bg-[#b85c38]"
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-terra">{product.category}</p>
+        <h3 className="mt-2 font-serif text-2xl font-bold text-theme-primary">{product.name}</h3>
+        <p className="mt-3 text-sm leading-6 text-theme-secondary">{product.description}</p>
+        <p className="mt-4 text-lg font-semibold text-brand-terra">{formatPrice(product.price)}</p>
+        <button type="button"
+          className="mt-6 w-full rounded-full border border-brand-green bg-brand-green px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-theme-light transition hover:border-brand-terra hover:bg-brand-terra"
           onClick={() => onAddToCart(product)}
         >
           Añadir al carrito
@@ -367,16 +276,16 @@ function ProductCard({ product, onAddToCart }: Readonly<{ product: Product; onAd
 
 function TrustSection() {
   return (
-    <section id="nosotros" className="border-y border-[#d9c18e] bg-[#e8dcc6] px-5 py-16 sm:px-8">
+    <section id="nosotros" className="border-y border-theme bg-theme-muted px-5 py-16 sm:px-8">
       <div className="mx-auto grid max-w-7xl gap-5 md:grid-cols-3">
         {trustItems.map((item) => (
-          <div key={item.title} className="flex gap-4 rounded-lg bg-[#fffaf1]/75 p-6">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#173326] text-[#e8c96d]">
+          <div key={item.title} className="flex gap-4 rounded-lg bg-theme-surface/75 p-6">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-green text-brand-gold-2">
               {item.icon}
             </div>
             <div>
-              <h3 className="font-serif text-xl font-bold text-[#14221b]">{item.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-[#315c48]">{item.description}</p>
+              <h3 className="font-serif text-xl font-bold text-theme-primary">{item.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-theme-secondary">{item.description}</p>
             </div>
           </div>
         ))}
@@ -385,42 +294,25 @@ function TrustSection() {
   );
 }
 
-function CartPanel({
-  cartItems,
-  cartTotal,
-  isOpen,
-  message,
-  onClear,
-  onClose,
-  onRemove
-}: Readonly<{
-  cartItems: CartItem[];
-  cartTotal: number;
-  isOpen: boolean;
-  message: string;
-  onClear: () => void;
-  onClose: () => void;
-  onRemove: (productId: string) => void;
+function CartPanel({ cartItems, cartTotal, isOpen, message, onClear, onClose, onRemove }: Readonly<{
+  cartItems: CartItem[]; cartTotal: number; isOpen: boolean; message: string;
+  onClear: () => void; onClose: () => void; onRemove: (productId: string) => void;
 }>) {
-  if (!isOpen) {
-    return null;
-  }
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[70] bg-[#0f1d17]/55 backdrop-blur-sm">
-      <aside className="ml-auto flex h-full w-full max-w-md flex-col bg-[#fffaf1] px-5 py-6 shadow-2xl sm:px-6">
+    <div className="fixed inset-0 z-[70] bg-black/55 backdrop-blur-sm">
+      <aside className="ml-auto flex h-full w-full max-w-md flex-col bg-theme-surface px-5 py-6 shadow-2xl sm:px-6">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Image src="/logo.webp" alt="Sombreros Tres Raices" width={40} height={40} className="rounded-full object-cover" />
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#b85c38]">Carrito</p>
-              <h2 className="font-serif text-3xl font-bold text-[#14221b]">Tu selección</h2>
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-brand-terra">Carrito</p>
+              <h2 className="font-serif text-3xl font-bold text-theme-primary">Tu selección</h2>
             </div>
           </div>
-          <button
-            type="button"
-            aria-label="Cerrar carrito"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#d9c18e] text-[#173326] transition hover:bg-[#e8dcc6]"
+          <button type="button" aria-label="Cerrar carrito"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-theme text-theme-primary transition hover:bg-theme-muted"
             onClick={onClose}
           >
             <CloseIcon />
@@ -431,17 +323,14 @@ function CartPanel({
           {cartItems.length > 0 ? (
             <div className="space-y-4">
               {cartItems.map((item) => (
-                <div key={item.id} className="rounded-lg border border-[#d9c18e] bg-[#fbf5ea] p-4">
+                <div key={item.id} className="rounded-lg border border-theme bg-theme-card p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h3 className="font-serif text-xl font-bold text-[#14221b]">{item.name}</h3>
-                      <p className="mt-1 text-sm text-[#315c48]">
-                        {item.quantity} unidad{item.quantity > 1 ? "es" : ""} x {formatPrice(item.price)}
-                      </p>
+                      <h3 className="font-serif text-xl font-bold text-theme-primary">{item.name}</h3>
+                      <p className="mt-1 text-sm text-theme-secondary">{item.quantity} unidad{item.quantity > 1 ? "es" : ""} x {formatPrice(item.price)}</p>
                     </div>
-                    <button
-                      type="button"
-                      className="rounded-full border border-[#d9c18e] px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-[#b85c38] transition hover:bg-[#f0dfcb]"
+                    <button type="button"
+                      className="rounded-full border border-theme px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-brand-terra transition hover:bg-theme-muted"
                       onClick={() => onRemove(item.id)}
                     >
                       Quitar
@@ -449,26 +338,21 @@ function CartPanel({
                   </div>
                 </div>
               ))}
-              <button type="button" className="text-sm font-semibold text-[#b85c38] underline" onClick={onClear}>
-                Vaciar carrito
-              </button>
+              <button type="button" className="text-sm font-semibold text-brand-terra underline" onClick={onClear}>Vaciar carrito</button>
             </div>
           ) : (
-            <div className="rounded-lg border border-dashed border-[#d9c18e] bg-[#fbf5ea] p-6 text-[#315c48]">
+            <div className="rounded-lg border border-dashed border-theme bg-theme-card p-6 text-theme-secondary">
               Tu carrito está vacío. Agrega un sombrero para enviar tu pedido por WhatsApp.
             </div>
           )}
         </div>
 
-        <div className="border-t border-[#d9c18e] pt-5">
-          <div className="flex items-center justify-between text-lg font-bold text-[#14221b]">
+        <div className="border-t border-theme pt-5">
+          <div className="flex items-center justify-between text-lg font-bold text-theme-primary">
             <span>Total</span>
             <span>{formatPrice(cartTotal)}</span>
           </div>
-          <a
-            href={createWhatsAppUrl(message)}
-            className="mt-5 flex w-full items-center justify-center rounded-full bg-[#173326] px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-[#fffaf1] transition hover:bg-[#b85c38]"
-          >
+          <a href={createWhatsAppUrl(message)} className="mt-5 flex w-full items-center justify-center rounded-full bg-brand-green px-6 py-4 text-sm font-bold uppercase tracking-[0.16em] text-theme-light transition hover:bg-brand-terra">
             Finalizar por WhatsApp
           </a>
         </div>
@@ -479,10 +363,9 @@ function CartPanel({
 
 function FloatingWhatsApp() {
   return (
-    <a
-      href={createWhatsAppUrl("Hola, quiero información sobre los sombreros artesanales de Sombreros Tres Raices.")}
+    <a href={createWhatsAppUrl("Hola, quiero información sobre los sombreros artesanales de Sombreros Tres Raices.")}
       aria-label="Contactar por WhatsApp"
-      className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#1f7a4d] shadow-[0_12px_30px_rgba(15,29,23,0.32)] transition hover:-translate-y-1 hover:bg-[#173326]"
+      className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#1f7a4d] shadow-[0_12px_30px_rgba(15,29,23,0.32)] transition hover:-translate-y-1 hover:bg-brand-green"
     >
       <Image src="/icons/whatsapp.svg" alt="WhatsApp" width={28} height={28} />
     </a>
@@ -491,53 +374,33 @@ function FloatingWhatsApp() {
 
 function Footer() {
   return (
-    <footer id="contacto" className="bg-[#0f1d17] px-5 py-10 text-[#fffaf1] sm:px-8">
+    <footer id="contacto" className="bg-theme-dark px-5 py-10 text-theme-light sm:px-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 md:flex-row md:items-center md:justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <Image src="/logo.webp" alt="Sombreros Tres Raices" width={48} height={48} className="rounded-full object-cover" />
-            <div>
-              <p className="font-serif text-2xl font-bold">Sombreros Tres Raices</p>
-              <p className="mt-1 text-sm text-[#d9c18e]">Tradición artesanal colombiana para vestir con presencia.</p>
-            </div>
+        <div className="flex items-center gap-3">
+          <Image src="/logo.webp" alt="Sombreros Tres Raices" width={48} height={48} className="rounded-full object-cover" />
+          <div>
+            <p className="font-serif text-2xl font-bold">Sombreros Tres Raices</p>
+            <p className="mt-1 text-sm text-theme-muted">Tradición artesanal colombiana para vestir con presencia.</p>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-5 text-sm font-medium uppercase tracking-[0.16em] text-[#d9c18e]">
+        <div className="flex flex-wrap gap-5 text-sm font-medium uppercase tracking-[0.16em] text-theme-muted">
           {navLinks.map((link) => (
-            <Link key={link.label} href={link.href} className="transition hover:text-[#e8c96d]">
-              {link.label}
-            </Link>
+            <Link key={link.label} href={link.href} className="transition hover:text-brand-gold-2">{link.label}</Link>
           ))}
         </div>
 
-        {/* Redes sociales y WhatsApp */}
         <div className="flex items-center gap-4">
-          <a
-            href="https://www.facebook.com/share/1BweGm7wmX/?mibextid=wwXIfr"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Facebook"
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fffaf1]/10 transition hover:bg-[#fffaf1]/25"
-          >
+          <a href="https://www.facebook.com/share/1BweGm7wmX/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/25">
             <Image src="/icons/facebook.svg" alt="Facebook" width={22} height={22} />
           </a>
-          <a
-            href="https://www.instagram.com/tresraicessombreros?igsh=Z3IzcnIycnhuNzYx"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fffaf1]/10 transition hover:bg-[#fffaf1]/25"
-          >
+          <a href="https://www.instagram.com/tresraicessombreros?igsh=Z3IzcnIycnhuNzYx" target="_blank" rel="noopener noreferrer" aria-label="Instagram"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/25">
             <Image src="/icons/instagram.svg" alt="Instagram" width={22} height={22} />
           </a>
-          <a
-            href={createWhatsAppUrl("Hola, quiero información sobre Sombreros Tres Raices.")}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="WhatsApp"
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fffaf1]/10 transition hover:bg-[#fffaf1]/25"
-          >
+          <a href={createWhatsAppUrl("Hola, quiero información sobre Sombreros Tres Raices.")} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/25">
             <Image src="/icons/whatsapp.svg" alt="WhatsApp" width={22} height={22} />
           </a>
         </div>
@@ -576,11 +439,7 @@ function WhatsAppIcon() {
 function CartIcon() {
   return (
     <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M2.75 3.75h2.6l2.1 11.05a2 2 0 0 0 1.97 1.63h7.86a2 2 0 0 0 1.93-1.48l1.28-4.75H7.1"
-      />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.75 3.75h2.6l2.1 11.05a2 2 0 0 0 1.97 1.63h7.86a2 2 0 0 0 1.93-1.48l1.28-4.75H7.1" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M9.25 20.25h.01M17.25 20.25h.01" />
     </svg>
   );
@@ -601,5 +460,3 @@ function CloseIcon() {
     </svg>
   );
 }
-
-
