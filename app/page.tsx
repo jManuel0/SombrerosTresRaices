@@ -217,6 +217,16 @@ function Hero() {
 
       <div className="relative mx-auto flex min-h-[76vh] max-w-7xl items-center px-5 pb-16 pt-20 sm:px-8 lg:min-h-[82vh]">
         <div className="max-w-3xl text-[#fffaf1]">
+          {/* Logo sello en el hero */}
+          <div className="mb-6 flex items-center gap-3">
+            <Image
+              src="/logo.webp"
+              alt="Sombreros Tres Raices"
+              width={64}
+              height={64}
+              className="rounded-full border-2 border-[#c49a3a]/60 object-cover shadow-lg"
+            />
+          </div>
           <p className="mb-5 inline-flex border-l-2 border-[#c49a3a] pl-4 text-sm font-semibold uppercase tracking-[0.24em] text-[#e8c96d] sm:tracking-[0.28em]">
             Hechos a mano en Colombia
           </p>
@@ -400,9 +410,12 @@ function CartPanel({
     <div className="fixed inset-0 z-[70] bg-[#0f1d17]/55 backdrop-blur-sm">
       <aside className="ml-auto flex h-full w-full max-w-md flex-col bg-[#fffaf1] px-5 py-6 shadow-2xl sm:px-6">
         <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#b85c38]">Carrito</p>
-            <h2 className="mt-1 font-serif text-3xl font-bold text-[#14221b]">Tu selección</h2>
+          <div className="flex items-center gap-3">
+            <Image src="/logo.webp" alt="Sombreros Tres Raices" width={40} height={40} className="rounded-full object-cover" />
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#b85c38]">Carrito</p>
+              <h2 className="font-serif text-3xl font-bold text-[#14221b]">Tu selección</h2>
+            </div>
           </div>
           <button
             type="button"

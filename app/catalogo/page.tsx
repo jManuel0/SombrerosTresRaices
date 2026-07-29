@@ -135,11 +135,9 @@ export default function CatalogPage() {
       {/* Header */}
       <header className="border-b border-[#d9c18e]/70 bg-[#fbf5ea] px-5 py-5 sm:px-8">
         <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <Link
-            href="/"
-            className="font-serif text-xl font-bold tracking-wide text-[#173326]"
-          >
-            Sombreros Tres Raices
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/logo.webp" alt="Sombreros Tres Raices" width={40} height={40} className="rounded-full object-cover" />
+            <span className="font-serif text-xl font-bold tracking-wide text-[#173326]">Sombreros Tres Raices</span>
           </Link>
           <Link
             href="/"
@@ -153,9 +151,12 @@ export default function CatalogPage() {
       <section className="px-5 py-16 sm:px-8 lg:py-20">
         <div className="mx-auto max-w-7xl">
           {/* Título */}
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#b85c38]">
-            Catálogo completo
-          </p>
+          <div className="flex items-center gap-4">
+            <Image src="/logo.webp" alt="Sombreros Tres Raices" width={56} height={56} className="rounded-full object-cover shadow-md" />
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#b85c38]">
+              Catálogo completo
+            </p>
+          </div>
           <div className="mt-4 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
             <h1 className="font-serif text-5xl font-bold leading-tight text-[#14221b] sm:text-6xl">
               Sombreros artesanales para cada ocasión
