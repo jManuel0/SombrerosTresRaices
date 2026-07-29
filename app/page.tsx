@@ -141,8 +141,9 @@ function Navbar({
   return (
     <header className="sticky top-0 z-50 border-b border-[#d9c18e]/60 bg-[#fbf5ea]/90 backdrop-blur">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
-        <Link href="/" className="font-serif text-xl font-bold tracking-wide text-[#173326]" onClick={onMenuClose}>
-          Sombreros Tres Raices
+        <Link href="/" className="flex items-center gap-2" onClick={onMenuClose}>
+          <Image src="/logo.webp" alt="Sombreros Tres Raices" width={44} height={44} className="rounded-full object-cover" />
+          <span className="font-serif text-xl font-bold tracking-wide text-[#173326]">Sombreros Tres Raices</span>
         </Link>
 
         <div className="hidden items-center gap-8 text-sm font-medium uppercase tracking-[0.18em] text-[#315c48] md:flex">
@@ -480,8 +481,13 @@ function Footer() {
     <footer id="contacto" className="bg-[#0f1d17] px-5 py-10 text-[#fffaf1] sm:px-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="font-serif text-2xl font-bold">Sombreros Tres Raices</p>
-          <p className="mt-2 text-sm text-[#d9c18e]">Tradición artesanal colombiana para vestir con presencia.</p>
+          <div className="flex items-center gap-3">
+            <Image src="/logo.webp" alt="Sombreros Tres Raices" width={48} height={48} className="rounded-full object-cover" />
+            <div>
+              <p className="font-serif text-2xl font-bold">Sombreros Tres Raices</p>
+              <p className="mt-1 text-sm text-[#d9c18e]">Tradición artesanal colombiana para vestir con presencia.</p>
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-5 text-sm font-medium uppercase tracking-[0.16em] text-[#d9c18e]">

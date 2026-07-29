@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   },
   description: "Sombreros artesanales colombianos con elegancia, tradición y envíos a todo Colombia.",
   keywords: ["sombreros colombianos", "sombreros artesanales", "sombreros vueltiaos", "Sombreros Tres Raices"],
+  icons: {
+    icon: "/logo.webp",
+    apple: "/logo.webp",
+  },
   openGraph: {
     title: "Sombreros Tres Raices",
     description: "Tienda online de sombreros artesanales colombianos.",
@@ -19,7 +23,7 @@ export const metadata: Metadata = {
     locale: "es_CO",
     images: [
       {
-        url: "https://picsum.photos/seed/sombreros-tres-raices-og/1200/630",
+        url: "/logo.webp",
         width: 1200,
         height: 630,
         alt: "Sombreros artesanales de Sombreros Tres Raices"
