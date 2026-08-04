@@ -233,6 +233,16 @@ function Hero() {
 }
 
 function CatalogPreview({ onAddToCart }: Readonly<{ onAddToCart: (product: Product, size: string) => void }>) {
+  const [search, setSearch] = useState("");
+  const normalizedSearch = search.trim().toLowerCase();
+  const visibleProducts = normalizedSearch
+    ? featuredProducts.filter((product) =>
+        [product.name, product.category, product.description].some((value) =>
+          value.toLowerCase().includes(normalizedSearch)
+        )
+      )
+    : featuredProducts;
+
   return (
     <section id="catalogo" className="bg-theme-surface px-5 py-20 sm:px-8 lg:py-24">
       <div className="mx-auto max-w-7xl">
@@ -246,11 +256,41 @@ function CatalogPreview({ onAddToCart }: Readonly<{ onAddToCart: (product: Produ
           </p>
         </div>
 
+        <div className="mt-8">
+          <label htmlFor="home-catalog-search" className="sr-only">Buscar sombrero</label>
+          <div className="relative max-w-xl">
+            <svg
+              aria-hidden="true"
+              className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-theme-secondary"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+            </svg>
+            <input
+              id="home-catalog-search"
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Buscar sombrero..."
+              className="w-full rounded-full border border-theme bg-theme-card py-3 pl-11 pr-4 text-sm text-theme-primary shadow-sm outline-none transition placeholder:text-theme-secondary focus:border-brand-green focus:ring-2 focus:ring-brand-green/30"
+            />
+          </div>
+        </div>
+
         <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {featuredProducts.map((product) => (
+          {visibleProducts.map((product) => (
             <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} />
           ))}
         </div>
+
+        {visibleProducts.length === 0 ? (
+          <div className="mt-8 rounded-lg border border-dashed border-theme bg-theme-card p-6 text-center text-theme-secondary">
+            No encontramos sombreros destacados con esa búsqueda.
+          </div>
+        ) : null}
 
         <div className="mt-10 text-center">
           <Link href="/catalogo" className="inline-flex items-center justify-center rounded-full border border-theme bg-transparent px-7 py-3 text-sm font-bold uppercase tracking-[0.16em] text-theme-primary transition hover:bg-brand-green hover:text-theme-light hover:border-brand-green">
@@ -261,7 +301,6 @@ function CatalogPreview({ onAddToCart }: Readonly<{ onAddToCart: (product: Produ
     </section>
   );
 }
-
 const SIZES = ["3 / 54 cm", "4 / 56 cm", "5 / 58 cm", "6 / 60 cm"];
 
 // ─── Modal de zoom ─────────────────────────────────────────────────────────
@@ -657,3 +696,4 @@ function MoonIcon() {
     </svg>
   );
 }
+
