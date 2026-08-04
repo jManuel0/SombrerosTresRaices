@@ -83,6 +83,16 @@ export default function Home() {
     );
   }
 
+  function increaseQuantity(productId: string, size: string) {
+    setCartItems((current) =>
+      current.map((item) => item.id === productId && item.size === size ? { ...item, quantity: item.quantity + 1 } : item)
+    );
+  }
+
+  function deleteFromCart(productId: string, size: string) {
+    setCartItems((current) => current.filter((item) => !(item.id === productId && item.size === size)));
+  }
+
   function clearCart() { setCartItems([]); }
 
   return (
@@ -92,7 +102,7 @@ export default function Home() {
       <CatalogPreview onAddToCart={addToCart} />
       <TrustSection />
       <Footer />
-      <CartPanel cartItems={cartItems} cartTotal={cartTotal} isOpen={isCartOpen} message={cartMessage} onClear={clearCart} onClose={() => setIsCartOpen(false)} onRemove={(id, size) => removeFromCart(id, size)} />
+      <CartPanel cartItems={cartItems} cartTotal={cartTotal} isOpen={isCartOpen} message={cartMessage} onClear={clearCart} onClose={() => setIsCartOpen(false)} onRemove={(id, size) => removeFromCart(id, size)} onIncrease={(id, size) => increaseQuantity(id, size)} onDelete={(id, size) => deleteFromCart(id, size)} />
       <FloatingWhatsApp />
     </main>
   );
@@ -439,9 +449,10 @@ function TrustSection() {
   );
 }
 
-function CartPanel({ cartItems, cartTotal, isOpen, message, onClear, onClose, onRemove }: Readonly<{
+function CartPanel({ cartItems, cartTotal, isOpen, message, onClear, onClose, onRemove, onIncrease, onDelete }: Readonly<{
   cartItems: CartItem[]; cartTotal: number; isOpen: boolean; message: string;
   onClear: () => void; onClose: () => void; onRemove: (productId: string, size: string) => void;
+  onIncrease: (productId: string, size: string) => void; onDelete: (productId: string, size: string) => void;
 }>) {
   if (!isOpen) return null;
 
@@ -470,16 +481,40 @@ function CartPanel({ cartItems, cartTotal, isOpen, message, onClear, onClose, on
               {cartItems.map((item) => (
                 <div key={item.id} className="rounded-lg border border-theme bg-theme-card p-4">
                   <div className="flex items-start justify-between gap-4">
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <h3 className="font-serif text-xl font-bold text-theme-primary">{item.name}</h3>
-                      <p className="mt-1 text-sm text-theme-secondary">Talla: {item.size} · {item.quantity} unidad{item.quantity > 1 ? "es" : ""} x {formatPrice(item.price)}</p>
+                      <p className="mt-1 text-sm text-theme-secondary">Talla: {item.size} · {formatPrice(item.price)} c/u</p>
                     </div>
-                    <button type="button"
-                      className="rounded-full border border-theme px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-brand-terra transition hover:bg-theme-muted"
+                    {/* Botón eliminar completamente */}
+                    <button
+                      type="button"
+                      aria-label={`Eliminar ${item.name}`}
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-theme text-theme-secondary transition hover:bg-red-50 hover:text-red-600 hover:border-red-300 dark:hover:bg-red-950 dark:hover:text-red-400"
+                      onClick={() => onDelete(item.id, item.size)}
+                    >
+                      <CloseIcon />
+                    </button>
+                  </div>
+                  {/* Controles de cantidad */}
+                  <div className="mt-3 flex items-center gap-2">
+                    <button
+                      type="button"
+                      aria-label="Disminuir cantidad"
+                      className="flex h-8 w-8 items-center justify-center rounded-full border border-theme bg-theme-surface text-theme-primary font-bold text-lg transition hover:bg-theme-muted disabled:opacity-40"
                       onClick={() => onRemove(item.id, item.size)}
                     >
-                      Quitar
+                      −
                     </button>
+                    <span className="min-w-[2rem] text-center text-sm font-bold text-theme-primary">{item.quantity}</span>
+                    <button
+                      type="button"
+                      aria-label="Aumentar cantidad"
+                      className="flex h-8 w-8 items-center justify-center rounded-full border border-theme bg-theme-surface text-theme-primary font-bold text-lg transition hover:bg-theme-muted"
+                      onClick={() => onIncrease(item.id, item.size)}
+                    >
+                      +
+                    </button>
+                    <span className="ml-2 text-sm text-theme-secondary">= {formatPrice(item.price * item.quantity)}</span>
                   </div>
                 </div>
               ))}

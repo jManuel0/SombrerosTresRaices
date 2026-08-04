@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { products, TAG_CONFIG } from "@/lib/products";
 import type { Tag } from "@/lib/products";
 import { LOW_STOCK_THRESHOLD } from "@/lib/products";
@@ -10,6 +10,7 @@ import { createWhatsAppUrl, formatPrice } from "@/lib/shop";
 import { useTheme } from "@/app/theme-provider";
 
 type Filter = "todos" | Tag;
+type SortOption = "relevancia" | "precio-asc" | "precio-desc";
 
 const FILTERS: { id: Filter; label: string; emoji: string }[] = [
   { id: "todos",           label: "Todos",           emoji: "🗂️" },
@@ -17,6 +18,12 @@ const FILTERS: { id: Filter; label: string; emoji: string }[] = [
   { id: "destacado",       label: "Destacados",      emoji: "⭐" },
   { id: "tradicional",     label: "Tradicionales",   emoji: "🎩" },
   { id: "nueva-coleccion", label: "Nueva colección", emoji: "🆕" },
+];
+
+const SORT_OPTIONS: { id: SortOption; label: string }[] = [
+  { id: "relevancia",  label: "Relevancia" },
+  { id: "precio-asc",  label: "Precio: menor a mayor" },
+  { id: "precio-desc", label: "Precio: mayor a menor" },
 ];
 
 const SIZES = ["3 / 54 cm", "4 / 56 cm", "5 / 58 cm", "6 / 60 cm"];
@@ -86,12 +93,33 @@ function ProductCard({ product, index }: { product: (typeof products)[0]; index:
   const [current, setCurrent] = useState(0);
   const [size, setSize] = useState("");
   const [zoomSrc, setZoomSrc] = useState<string | null>(null);
+  const [copiedLink, setCopiedLink] = useState(false);
   const { ref, inView } = useInView();
 
-  const prev = () => setCurrent((i) => (i - 1 + product.images.length) % product.images.length);
-  const next = () => setCurrent((i) => (i + 1) % product.images.length);
+  const prev = useCallback(() => setCurrent((i) => (i - 1 + product.images.length) % product.images.length), [product.images.length]);
+  const next = useCallback(() => setCurrent((i) => (i + 1) % product.images.length), [product.images.length]);
 
   const delay = `delay-${Math.min(index * 100, 500)}`;
+
+  const productUrl = `/catalogo/${product.id}`;
+
+  function handleShareWhatsApp(e: React.MouseEvent) {
+    e.preventDefault();
+    const siteUrl = typeof window !== "undefined" ? window.location.origin : "";
+    const url = `${siteUrl}${productUrl}`;
+    const text = `¡Mira este sombrero artesanal! ${product.name} - ${formatPrice(product.price)}\n${url}`;
+    window.open(createWhatsAppUrl(text), "_blank", "noopener,noreferrer");
+  }
+
+  function handleCopyLink(e: React.MouseEvent) {
+    e.preventDefault();
+    const siteUrl = typeof window !== "undefined" ? window.location.origin : "";
+    const url = `${siteUrl}${productUrl}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    });
+  }
 
   return (
     <>
@@ -216,6 +244,7 @@ function ProductCard({ product, index }: { product: (typeof products)[0]; index:
             {!size && <p className="mt-1.5 text-xs text-brand-terra">Selecciona una talla</p>}
           </div>
 
+          {/* Botón consultar WhatsApp */}
           <a
             href={size ? createWhatsAppUrl(`Hola, quiero información sobre el ${product.name} en talla ${size}.`) : "#"}
             onClick={(e) => { if (!size) e.preventDefault(); }}
@@ -225,6 +254,52 @@ function ProductCard({ product, index }: { product: (typeof products)[0]; index:
           >
             Consultar por WhatsApp
           </a>
+
+          {/* Fila inferior: Ver detalle + Compartir */}
+          <div className="mt-3 flex items-center gap-2">
+            {/* Ver detalle */}
+            <Link
+              href={productUrl}
+              className="flex-1 flex items-center justify-center rounded-full border border-theme bg-theme-surface px-4 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-theme-primary transition hover:bg-brand-green hover:text-theme-light hover:border-brand-green"
+            >
+              Ver detalle
+            </Link>
+
+            {/* Compartir WhatsApp */}
+            <button
+              type="button"
+              onClick={handleShareWhatsApp}
+              title="Compartir en WhatsApp"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-theme bg-theme-surface text-theme-primary transition hover:bg-[#1f7a4d] hover:border-[#1f7a4d] hover:text-white"
+            >
+              <Image src="/icons/whatsapp.svg" alt="Compartir en WhatsApp" width={16} height={16} />
+            </button>
+
+            {/* Copiar link */}
+            <button
+              type="button"
+              onClick={handleCopyLink}
+              title={copiedLink ? "¡Copiado!" : "Copiar link"}
+              className={`flex h-9 w-9 items-center justify-center rounded-full border transition ${
+                copiedLink
+                  ? "border-brand-green bg-brand-green text-theme-light"
+                  : "border-theme bg-theme-surface text-theme-primary hover:bg-theme-muted"
+              }`}
+            >
+              {copiedLink ? (
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2M16 8h2a2 2 0 012 2v8a2 2 0 01-2 2h-8a2 2 0 01-2-2v-2" />
+                </svg>
+              )}
+            </button>
+          </div>
+          {copiedLink && (
+            <p className="mt-1.5 text-center text-xs font-semibold text-brand-green animate-fade-in">¡Copiado!</p>
+          )}
         </div>
       </article>
     </>
@@ -234,11 +309,23 @@ function ProductCard({ product, index }: { product: (typeof products)[0]; index:
 // ─── Página principal del catálogo ─────────────────────────────────────────
 export default function CatalogPage() {
   const [activeFilter, setActiveFilter] = useState<Filter>("todos");
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>("relevancia");
   const { theme, toggle } = useTheme();
 
-  const filtered = activeFilter === "todos"
-    ? products
-    : products.filter((p) => p.tags.includes(activeFilter));
+  const filtered = (() => {
+    // 1. Filtrar por tag
+    let result = activeFilter === "todos" ? products : products.filter((p) => p.tags.includes(activeFilter));
+    // 2. Filtrar por búsqueda
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      result = result.filter((p) => p.name.toLowerCase().includes(q));
+    }
+    // 3. Ordenar
+    if (sortBy === "precio-asc") return [...result].sort((a, b) => a.price - b.price);
+    if (sortBy === "precio-desc") return [...result].sort((a, b) => b.price - a.price);
+    return result;
+  })();
 
   return (
     <main className="min-h-screen bg-theme-base text-theme-primary">
@@ -281,8 +368,41 @@ export default function CatalogPage() {
             </p>
           </div>
 
+          {/* Buscador y Ordenamiento */}
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center animate-fade-in-up delay-200">
+            {/* Input de búsqueda */}
+            <div className="relative flex-1">
+              <svg
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-theme-secondary pointer-events-none"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+              </svg>
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Buscar sombrero..."
+                className="w-full rounded-full border border-theme bg-theme-surface py-2.5 pl-10 pr-4 text-sm text-theme-primary placeholder:text-theme-secondary focus:outline-none focus:ring-2 focus:ring-brand-green/50 transition"
+                aria-label="Buscar productos"
+              />
+            </div>
+
+            {/* Select de ordenamiento */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              className="rounded-full border border-theme bg-theme-surface px-4 py-2.5 text-sm text-theme-primary focus:outline-none focus:ring-2 focus:ring-brand-green/50 transition cursor-pointer"
+              aria-label="Ordenar productos"
+            >
+              {SORT_OPTIONS.map((opt) => (
+                <option key={opt.id} value={opt.id}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+
           {/* Filtros */}
-          <div className="mt-10 flex flex-wrap gap-2 animate-fade-in-up delay-300">
+          <div className="mt-6 flex flex-wrap gap-2 animate-fade-in-up delay-300">
             {FILTERS.map((filter) => {
               const isActive = activeFilter === filter.id;
               return (
@@ -315,8 +435,9 @@ export default function CatalogPage() {
             <div className="mt-10 animate-fade-in rounded-lg border border-dashed border-theme bg-theme-card p-12 text-center text-theme-secondary">
               <p className="text-4xl">🎩</p>
               <p className="mt-4 font-serif text-xl font-bold text-theme-primary">Sin resultados</p>
-              <p className="mt-2 text-sm">Prueba con otro filtro o explora todos los sombreros.</p>
-              <button onClick={() => setActiveFilter("todos")}
+              <p className="mt-2 text-sm">Prueba con otro filtro, búsqueda o explora todos los sombreros.</p>
+              <button
+                onClick={() => { setActiveFilter("todos"); setSearch(""); setSortBy("relevancia"); }}
                 className="mt-5 rounded-full bg-brand-green px-6 py-2.5 text-sm font-bold text-theme-light transition hover:bg-brand-terra"
               >
                 Ver todos
