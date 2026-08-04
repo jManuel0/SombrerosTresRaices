@@ -168,30 +168,51 @@ function Navbar({ cartCount, isMenuOpen, onCartOpen, onMenuClose, onMenuToggle }
 
 function Hero() {
   return (
-    <section className="relative isolate overflow-hidden">
-      <Image src="/hero.webp" alt="Sombrero artesanal colombiano sobre una mesa de taller" fill priority sizes="100vw" className="object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0f1d17]/90 via-[#173326]/68 to-[#6f3927]/20" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_22%,rgba(196,154,58,0.36),transparent_34%),linear-gradient(135deg,rgba(184,92,56,0.25)_0%,rgba(251,245,234,0)_48%,rgba(20,34,27,0.30)_100%)]" />
+    <section className="relative isolate overflow-hidden bg-[#0f1d17]">
+      {/* Fondo con textura radial dorada */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_60%_40%,rgba(196,154,58,0.18),transparent_60%),radial-gradient(ellipse_at_20%_80%,rgba(184,92,56,0.15),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_10%,rgba(23,51,38,0.8),transparent_70%)]" />
 
-      <div className="relative mx-auto flex min-h-[76vh] max-w-7xl items-center px-5 pb-16 pt-20 sm:px-8 lg:min-h-[82vh]">
-        <div className="max-w-3xl text-[#fffaf1]">
-          <div className="mb-6 flex items-center gap-3">
-            <Image src="/logo.webp" alt="Sombreros Tres Raices" width={64} height={64} className="rounded-full border-2 border-[#c49a3a]/60 object-cover shadow-lg" />
+      <div className="relative mx-auto flex min-h-[82vh] max-w-7xl flex-col items-center justify-center gap-8 px-5 pb-16 pt-20 sm:flex-row sm:items-center sm:px-8 lg:min-h-[88vh]">
+
+        {/* Logo grande */}
+        <div className="flex shrink-0 items-center justify-center">
+          <div className="relative flex h-56 w-56 items-center justify-center rounded-full border border-[#c49a3a]/30 bg-[#fffaf1]/5 p-6 shadow-[0_0_80px_rgba(196,154,58,0.20)] backdrop-blur-sm sm:h-72 sm:w-72 lg:h-80 lg:w-80">
+            {/* Anillo exterior decorativo */}
+            <div className="absolute inset-2 rounded-full border border-[#c49a3a]/15" />
+            <Image
+              src="/hero.webp"
+              alt="Logo Sombreros Tres Raices"
+              fill
+              priority
+              sizes="(min-width: 1024px) 320px, (min-width: 640px) 288px, 224px"
+              className="rounded-full object-contain p-6 brightness-0 invert"
+            />
           </div>
-          <p className="mb-5 inline-flex border-l-2 border-[#c49a3a] pl-4 text-sm font-semibold uppercase tracking-[0.24em] text-[#e8c96d] sm:tracking-[0.28em]">
+        </div>
+
+        {/* Texto */}
+        <div className="max-w-xl text-center text-[#fffaf1] sm:text-left">
+          <p className="mb-4 inline-flex border-l-2 border-[#c49a3a] pl-4 text-sm font-semibold uppercase tracking-[0.24em] text-[#e8c96d] sm:tracking-[0.28em]">
             Hechos a mano en Colombia
           </p>
           <h1 className="font-serif text-5xl font-bold leading-[0.95] tracking-normal sm:text-6xl lg:text-7xl">
-            Sombreros Tres Raices
+            Sombreros<br />Tres Raices
           </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-[#f7ead2] sm:text-xl">
+          <p className="mt-6 max-w-lg text-lg leading-8 text-[#f7ead2] sm:text-xl">
             Piezas artesanales con fibra natural, presencia elegante y el carácter cálido de la tradición colombiana.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <Link href="/catalogo" className="inline-flex items-center justify-center rounded-full bg-[#c49a3a] px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] text-[#102018] shadow-[0_18px_45px_rgba(16,32,24,0.38)] transition hover:-translate-y-1 hover:bg-[#e8c96d]">
+            <Link
+              href="/catalogo"
+              className="inline-flex items-center justify-center rounded-full bg-[#c49a3a] px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] text-[#102018] shadow-[0_18px_45px_rgba(16,32,24,0.38)] transition hover:-translate-y-1 hover:bg-[#e8c96d]"
+            >
               Ver catálogo
             </Link>
-            <a href={createWhatsAppUrl("Hola, quiero asesoría para elegir un sombrero artesanal.")} className="inline-flex items-center justify-center rounded-full border border-[#fffaf1]/70 px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] text-[#fffaf1] transition hover:-translate-y-1 hover:bg-[#fffaf1] hover:text-[#173326]">
+            <a
+              href={createWhatsAppUrl("Hola, quiero asesoría para elegir un sombrero artesanal.")}
+              className="inline-flex items-center justify-center rounded-full border border-[#fffaf1]/70 px-8 py-4 text-sm font-bold uppercase tracking-[0.18em] text-[#fffaf1] transition hover:-translate-y-1 hover:bg-[#fffaf1] hover:text-[#173326]"
+            >
               Hablar por WhatsApp
             </a>
           </div>
