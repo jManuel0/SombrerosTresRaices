@@ -355,21 +355,21 @@ export default function CatalogPage() {
       <section className="px-5 py-16 sm:px-8 lg:py-20">
         <div className="mx-auto max-w-7xl">
           {/* Título con animación */}
-          <div className="flex items-center gap-4 animate-fade-in-left delay-0">
+          <div className="flex items-center gap-4">
             <Image src="/logo.webp" alt="Sombreros Tres Raices" width={56} height={56} className="rounded-full object-cover shadow-md" />
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-terra">Catálogo completo</p>
           </div>
           <div className="mt-4 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-            <h1 className="animate-fade-in-up delay-100 font-serif text-5xl font-bold leading-tight text-theme-primary sm:text-6xl">
+            <h1 className="font-serif text-5xl font-bold leading-tight text-theme-primary sm:text-6xl">
               Sombreros artesanales para cada ocasión
             </h1>
-            <p className="animate-fade-in-up delay-200 text-base leading-7 text-theme-secondary">
+            <p className="text-base leading-7 text-theme-secondary">
               Cada pedido se confirma por WhatsApp antes del envío. Precios en COP.
             </p>
           </div>
 
           {/* Buscador y Ordenamiento */}
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center animate-fade-in-up delay-200">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             {/* Input de búsqueda */}
             <div className="relative flex-1">
               <svg
@@ -402,7 +402,7 @@ export default function CatalogPage() {
           </div>
 
           {/* Filtros */}
-          <div className="mt-6 flex flex-wrap gap-2 animate-fade-in-up delay-300">
+          <div className="mt-6 flex flex-wrap gap-2">
             {FILTERS.map((filter) => {
               const isActive = activeFilter === filter.id;
               return (
@@ -420,7 +420,7 @@ export default function CatalogPage() {
           </div>
 
           {/* Conteo */}
-          <p className="mt-6 text-sm text-theme-secondary animate-fade-in delay-400">
+          <p className="mt-6 text-sm text-theme-secondary">
             {filtered.length === 0
               ? "Ningún sombrero coincide con este filtro."
               : `${filtered.length} sombrero${filtered.length > 1 ? "s" : ""} encontrado${filtered.length > 1 ? "s" : ""}`}
