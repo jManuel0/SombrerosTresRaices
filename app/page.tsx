@@ -177,16 +177,18 @@ function Hero() {
 
         {/* Logo grande */}
         <div className="flex shrink-0 items-center justify-center">
-          <div className="relative flex h-56 w-56 items-center justify-center rounded-full border border-[#c49a3a]/30 bg-[#fffaf1]/5 p-6 shadow-[0_0_80px_rgba(196,154,58,0.20)] backdrop-blur-sm sm:h-72 sm:w-72 lg:h-80 lg:w-80">
-            {/* Anillo exterior decorativo */}
-            <div className="absolute inset-2 rounded-full border border-[#c49a3a]/15" />
+          <div className="relative flex h-56 w-56 items-center justify-center rounded-full border border-[#c49a3a]/40 shadow-[0_0_80px_rgba(196,154,58,0.25)] sm:h-72 sm:w-72 lg:h-80 lg:w-80"
+            style={{ background: "radial-gradient(circle, rgba(255,250,241,0.08) 0%, transparent 70%)" }}
+          >
+            <div className="absolute inset-2 rounded-full border border-[#c49a3a]/20" />
             <Image
               src="/hero.webp"
               alt="Logo Sombreros Tres Raices"
               fill
               priority
               sizes="(min-width: 1024px) 320px, (min-width: 640px) 288px, 224px"
-              className="rounded-full object-contain p-6 brightness-0 invert"
+              className="rounded-full object-contain p-8"
+              style={{ filter: "brightness(0) invert(1)" }}
             />
           </div>
         </div>
