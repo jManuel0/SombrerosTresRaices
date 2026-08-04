@@ -352,7 +352,7 @@ export default function CatalogPage() {
         </nav>
       </header>
 
-      <section className="px-5 py-16 sm:px-8 lg:py-20">
+      <section className="px-5 py-16 sm:px-8 lg:py-20" data-catalog-search-version="2026-08-04">
         <div className="mx-auto max-w-7xl">
           {/* Título con animación */}
           <div className="flex items-center gap-4">
@@ -382,7 +382,7 @@ export default function CatalogPage() {
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar sombrero..."
+                placeholder="Buscar por nombre de sombrero..."
                 className="w-full rounded-full border border-theme bg-theme-surface py-2.5 pl-10 pr-4 text-sm text-theme-primary placeholder:text-theme-secondary focus:outline-none focus:ring-2 focus:ring-brand-green/50 transition"
                 aria-label="Buscar productos"
               />
@@ -466,3 +466,4 @@ function MoonIcon() {
     </svg>
   );
 }
+
