@@ -182,13 +182,12 @@ function Hero() {
           >
             <div className="absolute inset-2 rounded-full border border-[#c49a3a]/20" />
             <Image
-              src="/hero.webp"
+              src="/hero.png"
               alt="Logo Sombreros Tres Raices"
               fill
               priority
               sizes="(min-width: 1024px) 320px, (min-width: 640px) 288px, 224px"
-              className="rounded-full object-contain p-8"
-              style={{ filter: "brightness(0) invert(1)" }}
+              className="object-contain p-8"
             />
           </div>
         </div>
