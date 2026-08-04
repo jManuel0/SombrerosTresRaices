@@ -222,7 +222,7 @@ function Hero() {
   );
 }
 
-function CatalogPreview({ onAddToCart }: Readonly<{ onAddToCart: (product: Product) => void }>) {
+function CatalogPreview({ onAddToCart }: Readonly<{ onAddToCart: (product: Product, size: string) => void }>) {
   return (
     <section id="catalogo" className="bg-theme-surface px-5 py-20 sm:px-8 lg:py-24">
       <div className="mx-auto max-w-7xl">
