@@ -5,6 +5,8 @@ export type Product = {
   name: string;
   category: string;
   price: number;
+  originalPrice?: number; // precio antes del descuento (opcional)
+  stock?: number;         // unidades disponibles (opcional, undefined = sin límite)
   images: string[];
   description: string;
   tags: Tag[];
@@ -17,12 +19,17 @@ export const TAG_CONFIG: Record<Tag, { label: string; emoji: string; color: stri
   "nueva-coleccion":  { label: "Nueva colección",   emoji: "🆕", color: "bg-emerald-600 text-white" },
 };
 
+// Umbral para mostrar el badge de "Últimas X unidades"
+export const LOW_STOCK_THRESHOLD = 5;
+
 export const products: Product[] = [
   {
     id: "sombrero-vallenato-colombia",
     name: "Sombrero Vallenato Colombia",
     category: "Sombrero Vallenato Colombia",
     price: 49999,
+    originalPrice: 65000,
+    stock: 3,
     tags: ["mas-vendido", "destacado"],
     images: [
       "/catalogo/sombrero-vallenato-colombia/imagen1.webp",
@@ -38,6 +45,7 @@ export const products: Product[] = [
     name: "Sombrero Vallenato Tradicional",
     category: "Sombrero Vallenato Tradicional",
     price: 49999,
+    originalPrice: 62000,
     tags: ["tradicional"],
     images: [
       "/catalogo/sombrero-vallenato-tradicional/imagen1.webp",
@@ -51,6 +59,7 @@ export const products: Product[] = [
     name: "Sombrero Vallenato 2",
     category: "Sombrero Vallenato 2",
     price: 49999,
+    stock: 2,
     tags: ["destacado"],
     images: [
       "/catalogo/sombrero-vallenato-2/imagen1.webp",
@@ -67,6 +76,7 @@ export const products: Product[] = [
     name: "Sombrero Vallenato Colombia 3",
     category: "Sombrero Vallenato Colombia 3",
     price: 49999,
+    originalPrice: 68000,
     tags: ["nueva-coleccion"],
     images: [
       "/catalogo/sombrero-vallenato-colombia-3/imagen1.webp",
@@ -81,6 +91,8 @@ export const products: Product[] = [
     name: "Sombrero Vallenato Colombia Blanco",
     category: "Sombrero Vallenato Colombia Blanco",
     price: 49999,
+    originalPrice: 60000,
+    stock: 4,
     tags: ["nueva-coleccion", "destacado"],
     images: [
       "/catalogo/sombrero-vallenato-colombia-blanco/imagen1.webp",

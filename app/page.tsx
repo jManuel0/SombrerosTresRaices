@@ -4,9 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState, useRef } from "react";
 import type { ReactNode } from "react";
-import { featuredProducts } from "@/lib/products";
+import { featuredProducts, TAG_CONFIG } from "@/lib/products";
 import type { Product } from "@/lib/products";
-import { TAG_CONFIG } from "@/lib/products";
+import { LOW_STOCK_THRESHOLD } from "@/lib/products";
 import { cartStorageKey, createCartMessage, createWhatsAppUrl, formatPrice } from "@/lib/shop";
 import type { CartItem } from "@/lib/shop";
 import { useTheme } from "./theme-provider";
@@ -365,7 +365,27 @@ function ProductCard({ product, onAddToCart }: Readonly<{ product: Product; onAd
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-terra">{product.category}</p>
           <h3 className="mt-2 font-serif text-2xl font-bold text-theme-primary">{product.name}</h3>
           <p className="mt-3 text-sm leading-6 text-theme-secondary">{product.description}</p>
-          <p className="mt-4 text-lg font-semibold text-brand-terra">{formatPrice(product.price)}</p>
+
+          {/* Precio con descuento */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-lg font-bold text-brand-terra">{formatPrice(product.price)}</span>
+            {product.originalPrice && (
+              <>
+                <span className="text-sm text-theme-secondary line-through">{formatPrice(product.originalPrice)}</span>
+                <span className="rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white">
+                  {Math.round((1 - product.price / product.originalPrice) * 100)}% off
+                </span>
+              </>
+            )}
+          </div>
+
+          {/* Badge de stock bajo */}
+          {product.stock !== undefined && product.stock <= LOW_STOCK_THRESHOLD && (
+            <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1 text-xs font-bold text-red-600 dark:bg-red-950 dark:text-red-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse inline-block" />
+              ¡Últimas {product.stock} unidades!
+            </p>
+          )}
 
           {/* Selector de talla */}
           <div className="mt-4">
