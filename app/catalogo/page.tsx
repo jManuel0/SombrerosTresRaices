@@ -18,7 +18,7 @@ const FILTERS: { id: Filter; label: string; emoji: string }[] = [
   { id: "nueva-coleccion", label: "Nueva colección", emoji: "🆕" },
 ];
 
-const SIZES = ["54 cm", "56 cm", "58 cm", "60 cm"];
+const SIZES = ["3 / 54 cm", "4 / 56 cm", "5 / 58 cm", "6 / 60 cm"];
 
 // ─── Modal de zoom ─────────────────────────────────────────────────────────
 function ImageZoomModal({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
