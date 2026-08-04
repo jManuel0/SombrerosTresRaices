@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import type { ReactNode } from "react";
 import { featuredProducts } from "@/lib/products";
 import type { Product } from "@/lib/products";
@@ -252,86 +252,150 @@ function CatalogPreview({ onAddToCart }: Readonly<{ onAddToCart: (product: Produ
   );
 }
 
-const SIZES = ["3", "4", "5", "6"];
+const SIZES = ["54 cm", "56 cm", "58 cm", "60 cm"];
+
+// ─── Modal de zoom ─────────────────────────────────────────────────────────
+function ImageZoomModal({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handler);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handler);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="zoom-modal-enter fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <button
+        aria-label="Cerrar zoom"
+        className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white transition hover:bg-white/40"
+        onClick={onClose}
+      >
+        ✕
+      </button>
+      <div
+        className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-xl shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Image src={src} alt={alt} width={900} height={1100} className="max-h-[90vh] w-auto object-contain" priority />
+      </div>
+    </div>
+  );
+}
+
+// ─── Hook para animar al entrar en viewport ────────────────────────────────
+function useInView() {
+  const ref = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); observer.disconnect(); } },
+      { threshold: 0.12 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return { ref, inView };
+}
 
 function ProductCard({ product, onAddToCart }: Readonly<{ product: Product; onAddToCart: (product: Product, size: string) => void }>) {
   const [current, setCurrent] = useState(0);
   const [size, setSize] = useState("");
+  const [zoomSrc, setZoomSrc] = useState<string | null>(null);
+  const { ref, inView } = useInView();
   const prev = () => setCurrent((i) => (i - 1 + product.images.length) % product.images.length);
   const next = () => setCurrent((i) => (i + 1) % product.images.length);
 
   return (
-    <article className="group overflow-hidden rounded-lg border border-theme bg-theme-card shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-      <div className="relative aspect-[4/5] overflow-hidden bg-theme-muted">
-        <Image src={product.images[current]} alt={`${product.name} - foto ${current + 1}`} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition duration-500 group-hover:scale-105" />
+    <>
+      {zoomSrc && <ImageZoomModal src={zoomSrc} alt={product.name} onClose={() => setZoomSrc(null)} />}
+      <article
+        ref={ref}
+        className={`group overflow-hidden rounded-lg border border-theme bg-theme-card shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl ${inView ? "animate-fade-in-up" : "opacity-0"}`}
+      >
+        <div className="relative aspect-[4/5] overflow-hidden bg-theme-muted">
+          <button aria-label="Ampliar imagen" className="absolute inset-0 z-10 cursor-zoom-in" onClick={() => setZoomSrc(product.images[current])} />
+          <Image src={product.images[current]} alt={`${product.name} - foto ${current + 1}`} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition duration-500 group-hover:scale-105" />
 
-        {/* Badges */}
-        {product.tags.length > 0 && (
-          <div className="absolute left-3 top-3 flex flex-col gap-1.5">
-            {product.tags.map((tag) => {
-              const cfg = TAG_CONFIG[tag];
-              return (
-                <span key={tag} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold shadow-md ${cfg.color}`}>
-                  <span>{cfg.emoji}</span><span>{cfg.label}</span>
-                </span>
-              );
-            })}
-          </div>
-        )}
+          {/* Icono zoom */}
+          <span className="absolute bottom-10 right-3 z-20 rounded-full bg-black/50 p-1.5 text-white opacity-0 backdrop-blur-sm transition group-hover:opacity-100">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0zM11 8v6M8 11h6" />
+            </svg>
+          </span>
 
-        {product.images.length > 1 && (
-          <>
-            <button onClick={prev} aria-label="Foto anterior" className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition hover:bg-black/80">‹</button>
-            <button onClick={next} aria-label="Foto siguiente" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition hover:bg-black/80">›</button>
-          </>
-        )}
-        {product.images.length > 1 && (
-          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-            {product.images.map((_, i) => (
-              <button key={i} onClick={() => setCurrent(i)} aria-label={`Ir a foto ${i + 1}`} className={`h-2 w-2 rounded-full transition ${i === current ? "bg-white" : "bg-white/40"}`} />
-            ))}
-          </div>
-        )}
-        <span className="absolute right-3 top-3 rounded-full bg-black/50 px-2 py-0.5 text-xs text-white backdrop-blur-sm">{current + 1} / {product.images.length}</span>
-      </div>
+          {/* Badges */}
+          {product.tags.length > 0 && (
+            <div className="absolute left-3 top-3 z-20 flex flex-col gap-1.5">
+              {product.tags.map((tag) => {
+                const cfg = TAG_CONFIG[tag];
+                return (
+                  <span key={tag} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold shadow-md ${cfg.color}`}>
+                    <span>{cfg.emoji}</span><span>{cfg.label}</span>
+                  </span>
+                );
+              })}
+            </div>
+          )}
 
-      <div className="p-6">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-terra">{product.category}</p>
-        <h3 className="mt-2 font-serif text-2xl font-bold text-theme-primary">{product.name}</h3>
-        <p className="mt-3 text-sm leading-6 text-theme-secondary">{product.description}</p>
-        <p className="mt-4 text-lg font-semibold text-brand-terra">{formatPrice(product.price)}</p>
-
-        {/* Selector de talla */}
-        <div className="mt-4">
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-theme-secondary">Talla</p>
-          <div className="flex gap-2">
-            {SIZES.map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => setSize(s)}
-                className={`h-10 w-10 rounded-full border text-sm font-bold transition ${
-                  size === s
-                    ? "border-brand-green bg-brand-green text-theme-light"
-                    : "border-theme bg-theme-surface text-theme-primary hover:border-brand-green"
-                }`}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-          {!size && <p className="mt-1.5 text-xs text-brand-terra">Selecciona una talla</p>}
+          {product.images.length > 1 && (
+            <>
+              <button onClick={prev} aria-label="Foto anterior" className="absolute left-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition hover:bg-black/80">‹</button>
+              <button onClick={next} aria-label="Foto siguiente" className="absolute right-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition hover:bg-black/80">›</button>
+            </>
+          )}
+          {product.images.length > 1 && (
+            <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 gap-1.5">
+              {product.images.map((_, i) => (
+                <button key={i} onClick={() => setCurrent(i)} aria-label={`Ir a foto ${i + 1}`} className={`h-2 w-2 rounded-full transition ${i === current ? "bg-white" : "bg-white/40"}`} />
+              ))}
+            </div>
+          )}
+          <span className="absolute right-3 top-3 z-20 rounded-full bg-black/50 px-2 py-0.5 text-xs text-white backdrop-blur-sm">{current + 1} / {product.images.length}</span>
         </div>
 
-        <button type="button"
-          disabled={!size}
-          className="mt-5 w-full rounded-full border border-brand-green bg-brand-green px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-theme-light transition hover:border-brand-terra hover:bg-brand-terra disabled:cursor-not-allowed disabled:opacity-50"
-          onClick={() => size && onAddToCart(product, size)}
-        >
-          Añadir al carrito
-        </button>
-      </div>
-    </article>
+        <div className="p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-terra">{product.category}</p>
+          <h3 className="mt-2 font-serif text-2xl font-bold text-theme-primary">{product.name}</h3>
+          <p className="mt-3 text-sm leading-6 text-theme-secondary">{product.description}</p>
+          <p className="mt-4 text-lg font-semibold text-brand-terra">{formatPrice(product.price)}</p>
+
+          {/* Selector de talla */}
+          <div className="mt-4">
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-theme-secondary">Talla (contorno de cabeza)</p>
+            <div className="flex flex-wrap gap-2">
+              {SIZES.map((s) => (
+                <button key={s} type="button" onClick={() => setSize(s)}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-bold transition ${
+                    size === s
+                      ? "border-brand-green bg-brand-green text-theme-light"
+                      : "border-theme bg-theme-surface text-theme-primary hover:border-brand-green"
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+            {!size && <p className="mt-1.5 text-xs text-brand-terra">Selecciona una talla</p>}
+          </div>
+
+          <button type="button"
+            disabled={!size}
+            className="mt-5 w-full rounded-full border border-brand-green bg-brand-green px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-theme-light transition hover:border-brand-terra hover:bg-brand-terra disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={() => size && onAddToCart(product, size)}
+          >
+            Añadir al carrito
+          </button>
+        </div>
+      </article>
+    </>
   );
 }
 

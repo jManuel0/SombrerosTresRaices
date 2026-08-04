@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { products, TAG_CONFIG } from "@/lib/products";
 import type { Tag } from "@/lib/products";
 import { createWhatsAppUrl, formatPrice } from "@/lib/shop";
@@ -18,97 +18,199 @@ const FILTERS: { id: Filter; label: string; emoji: string }[] = [
   { id: "nueva-coleccion", label: "Nueva colección", emoji: "🆕" },
 ];
 
-const SIZES = ["3", "4", "5", "6"];
+const SIZES = ["54 cm", "56 cm", "58 cm", "60 cm"];
 
-function ProductCard({ product }: { product: (typeof products)[0] }) {
-  const [current, setCurrent] = useState(0);
-  const [size, setSize] = useState("");
-  const prev = () => setCurrent((i) => (i - 1 + product.images.length) % product.images.length);
-  const next = () => setCurrent((i) => (i + 1) % product.images.length);
+// ─── Modal de zoom ─────────────────────────────────────────────────────────
+function ImageZoomModal({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handler);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handler);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
 
   return (
-    <article className="group overflow-hidden rounded-lg border border-theme bg-theme-card shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-      <div className="relative aspect-[4/5] overflow-hidden bg-theme-muted">
-        <Image src={product.images[current]} alt={`${product.name} - foto ${current + 1}`} fill sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover transition duration-500 group-hover:scale-105" />
-
-        {/* Badges */}
-        {product.tags.length > 0 && (
-          <div className="absolute left-3 top-3 flex flex-col gap-1.5">
-            {product.tags.map((tag) => {
-              const cfg = TAG_CONFIG[tag];
-              return (
-                <span key={tag} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold shadow-md ${cfg.color}`}>
-                  <span>{cfg.emoji}</span><span>{cfg.label}</span>
-                </span>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Contador */}
-        <span className="absolute right-3 top-3 rounded-full bg-black/50 px-2 py-0.5 text-xs text-white backdrop-blur-sm">
-          {current + 1} / {product.images.length}
-        </span>
-
-        {/* Flechas */}
-        {product.images.length > 1 && (
-          <>
-            <button onClick={prev} aria-label="Foto anterior" className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition hover:bg-black/80">‹</button>
-            <button onClick={next} aria-label="Foto siguiente" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition hover:bg-black/80">›</button>
-          </>
-        )}
-
-        {/* Puntos */}
-        {product.images.length > 1 && (
-          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-            {product.images.map((_, i) => (
-              <button key={i} onClick={() => setCurrent(i)} aria-label={`Ir a foto ${i + 1}`} className={`h-2 w-2 rounded-full transition ${i === current ? "bg-white" : "bg-white/40"}`} />
-            ))}
-          </div>
-        )}
+    <div
+      className="zoom-modal-enter fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <button
+        aria-label="Cerrar zoom"
+        className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white transition hover:bg-white/40"
+        onClick={onClose}
+      >
+        ✕
+      </button>
+      <div
+        className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-xl shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Image
+          src={src}
+          alt={alt}
+          width={900}
+          height={1100}
+          className="max-h-[90vh] w-auto object-contain"
+          priority
+        />
       </div>
-
-      <div className="p-6">
-        <h2 className="font-serif text-2xl font-bold text-theme-primary">{product.name}</h2>
-        <p className="mt-3 text-sm leading-6 text-theme-secondary">{product.description}</p>
-        <p className="mt-4 text-lg font-semibold text-brand-terra">{formatPrice(product.price)}</p>
-
-        {/* Selector de talla */}
-        <div className="mt-4">
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-theme-secondary">Talla</p>
-          <div className="flex gap-2">
-            {SIZES.map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => setSize(s)}
-                className={`h-10 w-10 rounded-full border text-sm font-bold transition ${
-                  size === s
-                    ? "border-brand-green bg-brand-green text-theme-light"
-                    : "border-theme bg-theme-surface text-theme-primary hover:border-brand-green"
-                }`}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-          {!size && <p className="mt-1.5 text-xs text-brand-terra">Selecciona una talla</p>}
-        </div>
-
-        <a
-          href={size ? createWhatsAppUrl(`Hola, quiero información sobre el ${product.name} en talla ${size}.`) : "#"}
-          onClick={(e) => { if (!size) e.preventDefault(); }}
-          className={`mt-5 flex w-full items-center justify-center rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-theme-light transition ${
-            size ? "bg-brand-green hover:bg-brand-terra" : "cursor-not-allowed bg-brand-green opacity-50"
-          }`}
-        >
-          Consultar por WhatsApp
-        </a>
-      </div>
-    </article>
+    </div>
   );
 }
 
+// ─── Hook para animar al entrar en viewport ────────────────────────────────
+function useInView() {
+  const ref = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); observer.disconnect(); } },
+      { threshold: 0.12 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, inView };
+}
+
+// ─── Tarjeta de producto ───────────────────────────────────────────────────
+function ProductCard({ product, index }: { product: (typeof products)[0]; index: number }) {
+  const [current, setCurrent] = useState(0);
+  const [size, setSize] = useState("");
+  const [zoomSrc, setZoomSrc] = useState<string | null>(null);
+  const { ref, inView } = useInView();
+
+  const prev = () => setCurrent((i) => (i - 1 + product.images.length) % product.images.length);
+  const next = () => setCurrent((i) => (i + 1) % product.images.length);
+
+  const delay = `delay-${Math.min(index * 100, 500)}`;
+
+  return (
+    <>
+      {zoomSrc && (
+        <ImageZoomModal
+          src={zoomSrc}
+          alt={product.name}
+          onClose={() => setZoomSrc(null)}
+        />
+      )}
+      <article
+        ref={ref}
+        className={`group overflow-hidden rounded-lg border border-theme bg-theme-card shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl ${
+          inView ? `animate-fade-in-up ${delay}` : "opacity-0"
+        }`}
+      >
+        <div className="relative aspect-[4/5] overflow-hidden bg-theme-muted">
+          {/* Imagen con cursor de zoom */}
+          <button
+            aria-label="Ampliar imagen"
+            className="absolute inset-0 z-10 cursor-zoom-in"
+            onClick={() => setZoomSrc(product.images[current])}
+          />
+          <Image
+            src={product.images[current]}
+            alt={`${product.name} - foto ${current + 1}`}
+            fill
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            className="object-cover transition duration-500 group-hover:scale-105"
+          />
+
+          {/* Icono de zoom */}
+          <span className="absolute right-3 bottom-10 z-20 rounded-full bg-black/50 p-1.5 text-white opacity-0 backdrop-blur-sm transition group-hover:opacity-100">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0zM11 8v6M8 11h6" />
+            </svg>
+          </span>
+
+          {/* Badges */}
+          {product.tags.length > 0 && (
+            <div className="absolute left-3 top-3 z-20 flex flex-col gap-1.5">
+              {product.tags.map((tag) => {
+                const cfg = TAG_CONFIG[tag];
+                return (
+                  <span key={tag} className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold shadow-md ${cfg.color}`}>
+                    <span>{cfg.emoji}</span><span>{cfg.label}</span>
+                  </span>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Contador */}
+          <span className="absolute right-3 top-3 z-20 rounded-full bg-black/50 px-2 py-0.5 text-xs text-white backdrop-blur-sm">
+            {current + 1} / {product.images.length}
+          </span>
+
+          {/* Flechas */}
+          {product.images.length > 1 && (
+            <>
+              <button onClick={prev} aria-label="Foto anterior" className="absolute left-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition hover:bg-black/80">‹</button>
+              <button onClick={next} aria-label="Foto siguiente" className="absolute right-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition hover:bg-black/80">›</button>
+            </>
+          )}
+
+          {/* Puntos */}
+          {product.images.length > 1 && (
+            <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 gap-1.5">
+              {product.images.map((_, i) => (
+                <button key={i} onClick={() => setCurrent(i)} aria-label={`Ir a foto ${i + 1}`} className={`h-2 w-2 rounded-full transition ${i === current ? "bg-white" : "bg-white/40"}`} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="p-6">
+          <h2 className="font-serif text-2xl font-bold text-theme-primary">{product.name}</h2>
+          <p className="mt-3 text-sm leading-6 text-theme-secondary">{product.description}</p>
+          <p className="mt-4 text-lg font-semibold text-brand-terra">{formatPrice(product.price)}</p>
+
+          {/* Selector de talla */}
+          <div className="mt-4">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-theme-secondary">Talla (contorno de cabeza)</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {SIZES.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setSize(s)}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-bold transition ${
+                    size === s
+                      ? "border-brand-green bg-brand-green text-theme-light"
+                      : "border-theme bg-theme-surface text-theme-primary hover:border-brand-green"
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+            {!size && <p className="mt-1.5 text-xs text-brand-terra">Selecciona una talla</p>}
+          </div>
+
+          <a
+            href={size ? createWhatsAppUrl(`Hola, quiero información sobre el ${product.name} en talla ${size}.`) : "#"}
+            onClick={(e) => { if (!size) e.preventDefault(); }}
+            className={`mt-5 flex w-full items-center justify-center rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-theme-light transition ${
+              size ? "bg-brand-green hover:bg-brand-terra" : "cursor-not-allowed bg-brand-green opacity-50"
+            }`}
+          >
+            Consultar por WhatsApp
+          </a>
+        </div>
+      </article>
+    </>
+  );
+}
+
+// ─── Página principal del catálogo ─────────────────────────────────────────
 export default function CatalogPage() {
   const [activeFilter, setActiveFilter] = useState<Filter>("todos");
   const { theme, toggle } = useTheme();
@@ -122,12 +224,11 @@ export default function CatalogPage() {
       {/* Header */}
       <header className="border-b border-theme-muted bg-nav backdrop-blur px-5 py-5 sm:px-8">
         <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 animate-fade-in delay-0">
             <Image src="/logo.webp" alt="Sombreros Tres Raices" width={40} height={40} className="rounded-full object-cover" />
             <span className="font-serif text-xl font-bold tracking-wide text-brand-green">Sombreros Tres Raices</span>
           </Link>
           <div className="flex items-center gap-3">
-            {/* Botón modo oscuro/claro */}
             <button
               type="button"
               aria-label={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
@@ -145,22 +246,22 @@ export default function CatalogPage() {
 
       <section className="px-5 py-16 sm:px-8 lg:py-20">
         <div className="mx-auto max-w-7xl">
-          {/* Título */}
-          <div className="flex items-center gap-4">
+          {/* Título con animación */}
+          <div className="flex items-center gap-4 animate-fade-in-left delay-0">
             <Image src="/logo.webp" alt="Sombreros Tres Raices" width={56} height={56} className="rounded-full object-cover shadow-md" />
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-terra">Catálogo completo</p>
           </div>
           <div className="mt-4 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-            <h1 className="font-serif text-5xl font-bold leading-tight text-theme-primary sm:text-6xl">
+            <h1 className="animate-fade-in-up delay-100 font-serif text-5xl font-bold leading-tight text-theme-primary sm:text-6xl">
               Sombreros artesanales para cada ocasión
             </h1>
-            <p className="text-base leading-7 text-theme-secondary">
+            <p className="animate-fade-in-up delay-200 text-base leading-7 text-theme-secondary">
               Cada pedido se confirma por WhatsApp antes del envío. Precios en COP.
             </p>
           </div>
 
           {/* Filtros */}
-          <div className="mt-10 flex flex-wrap gap-2">
+          <div className="mt-10 flex flex-wrap gap-2 animate-fade-in-up delay-300">
             {FILTERS.map((filter) => {
               const isActive = activeFilter === filter.id;
               return (
@@ -178,19 +279,19 @@ export default function CatalogPage() {
           </div>
 
           {/* Conteo */}
-          <p className="mt-6 text-sm text-theme-secondary">
+          <p className="mt-6 text-sm text-theme-secondary animate-fade-in delay-400">
             {filtered.length === 0
               ? "Ningún sombrero coincide con este filtro."
               : `${filtered.length} sombrero${filtered.length > 1 ? "s" : ""} encontrado${filtered.length > 1 ? "s" : ""}`}
           </p>
 
-          {/* Grid */}
+          {/* Grid con animaciones escalonadas */}
           {filtered.length > 0 ? (
             <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((product) => <ProductCard key={product.id} product={product} />)}
+              {filtered.map((product, i) => <ProductCard key={product.id} product={product} index={i} />)}
             </div>
           ) : (
-            <div className="mt-10 rounded-lg border border-dashed border-theme bg-theme-card p-12 text-center text-theme-secondary">
+            <div className="mt-10 animate-fade-in rounded-lg border border-dashed border-theme bg-theme-card p-12 text-center text-theme-secondary">
               <p className="text-4xl">🎩</p>
               <p className="mt-4 font-serif text-xl font-bold text-theme-primary">Sin resultados</p>
               <p className="mt-2 text-sm">Prueba con otro filtro o explora todos los sombreros.</p>
