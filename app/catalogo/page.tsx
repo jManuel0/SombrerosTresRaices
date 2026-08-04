@@ -332,7 +332,7 @@ export default function CatalogPage() {
       {/* Header */}
       <header className="border-b border-theme-muted bg-nav backdrop-blur px-5 py-5 sm:px-8">
         <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2 animate-fade-in delay-0">
+          <Link href="/" className="flex items-center gap-2">
             <Image src="/logo.webp" alt="Sombreros Tres Raices" width={40} height={40} className="rounded-full object-cover" />
             <span className="font-serif text-xl font-bold tracking-wide text-brand-green">Sombreros Tres Raices</span>
           </Link>
