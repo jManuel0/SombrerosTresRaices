@@ -108,22 +108,25 @@ export default function ProductDetailPage() {
     notFound();
   }
 
-  const prev = useCallback(() => setCurrent((i) => (i - 1 + product.images.length) % product.images.length), [product.images.length]);
-  const next = useCallback(() => setCurrent((i) => (i + 1) % product.images.length), [product.images.length]);
+  // A partir de aquí product está garantizado (notFound hace throw)
+  const safeProduct = product!;
 
-  const discountPct = product.originalPrice
-    ? Math.round((1 - product.price / product.originalPrice) * 100)
+  const prev = useCallback(() => setCurrent((i) => (i - 1 + safeProduct.images.length) % safeProduct.images.length), [safeProduct.images.length]);
+  const next = useCallback(() => setCurrent((i) => (i + 1) % safeProduct.images.length), [safeProduct.images.length]);
+
+  const discountPct = safeProduct.originalPrice
+    ? Math.round((1 - safeProduct.price / safeProduct.originalPrice) * 100)
     : null;
 
-  const isLowStock = product.stock !== undefined && product.stock <= LOW_STOCK_THRESHOLD;
+  const isLowStock = safeProduct.stock !== undefined && safeProduct.stock <= LOW_STOCK_THRESHOLD;
 
   function handleShareWhatsApp() {
-    const text = `¡Mira este sombrero artesanal! ${product.name} - ${formatPrice(product.price)}\n${pageUrl}`;
+    const text = `¡Mira este sombrero artesanal! ${safeProduct.name} - ${formatPrice(safeProduct.price)}\n${pageUrl}`;
     window.open(createWhatsAppUrl(text), "_blank", "noopener,noreferrer");
   }
 
   function handleShareInstagram() {
-    const text = `¡Mira este sombrero artesanal! ${product.name} - ${formatPrice(product.price)}\n${pageUrl}`;
+    const text = `¡Mira este sombrero artesanal! ${safeProduct.name} - ${formatPrice(safeProduct.price)}\n${pageUrl}`;
     navigator.clipboard.writeText(text).then(() => {
       alert("Texto copiado al portapapeles. Pégalo en Instagram para compartir.");
     });
@@ -139,13 +142,13 @@ export default function ProductDetailPage() {
 
   function handleConsultWhatsApp() {
     if (!size) return;
-    const text = `Hola, quiero información sobre el ${product.name} en talla ${size}.\n\nPrecio: ${formatPrice(product.price)}\nPágina: ${pageUrl}`;
+    const text = `Hola, quiero información sobre el ${safeProduct.name} en talla ${size}.\n\nPrecio: ${formatPrice(safeProduct.price)}\nPágina: ${pageUrl}`;
     window.open(createWhatsAppUrl(text), "_blank", "noopener,noreferrer");
   }
 
   return (
     <main className="min-h-screen bg-theme-base text-theme-primary">
-      {zoomSrc && <ImageZoomModal src={zoomSrc} alt={product.name} onClose={() => setZoomSrc(null)} />}
+      {zoomSrc && <ImageZoomModal src={zoomSrc} alt={safeProduct.name} onClose={() => setZoomSrc(null)} />}
 
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-theme-muted bg-nav backdrop-blur px-5 py-4 sm:px-8">
@@ -184,7 +187,7 @@ export default function ProductDetailPage() {
             <span>/</span>
             <Link href="/catalogo" className="hover:text-brand-terra transition">Catálogo</Link>
             <span>/</span>
-            <span className="text-theme-primary font-semibold">{product.name}</span>
+            <span className="text-theme-primary font-semibold">{safeProduct.name}</span>
           </nav>
 
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
@@ -196,11 +199,11 @@ export default function ProductDetailPage() {
                 <button
                   aria-label="Ampliar imagen"
                   className="absolute inset-0 z-10 cursor-zoom-in"
-                  onClick={() => setZoomSrc(product.images[current])}
+                  onClick={() => setZoomSrc(safeProduct.images[current])}
                 />
                 <Image
-                  src={product.images[current]}
-                  alt={`${product.name} - foto ${current + 1}`}
+                  src={safeProduct.images[current]}
+                  alt={`${safeProduct.name} - foto ${current + 1}`}
                   fill
                   priority
                   sizes="(min-width: 1024px) 50vw, 100vw"
@@ -216,33 +219,21 @@ export default function ProductDetailPage() {
 
                 {/* Contador */}
                 <span className="absolute right-4 top-4 z-20 rounded-full bg-black/50 px-2.5 py-1 text-xs text-white backdrop-blur-sm">
-                  {current + 1} / {product.images.length}
+                  {current + 1} / {safeProduct.images.length}
                 </span>
 
                 {/* Flechas */}
-                {product.images.length > 1 && (
+                {safeProduct.images.length > 1 && (
                   <>
-                    <button
-                      onClick={prev}
-                      aria-label="Foto anterior"
-                      className="absolute left-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition hover:bg-black/80"
-                    >
-                      <ChevronLeftIcon />
-                    </button>
-                    <button
-                      onClick={next}
-                      aria-label="Foto siguiente"
-                      className="absolute right-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition hover:bg-black/80"
-                    >
-                      <ChevronRightIcon />
-                    </button>
+                    <button onClick={prev} aria-label="Foto anterior" className="absolute left-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition hover:bg-black/80"><ChevronLeftIcon /></button>
+                    <button onClick={next} aria-label="Foto siguiente" className="absolute right-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition hover:bg-black/80"><ChevronRightIcon /></button>
                   </>
                 )}
 
                 {/* Puntos */}
-                {product.images.length > 1 && (
+                {safeProduct.images.length > 1 && (
                   <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 gap-2">
-                    {product.images.map((_, i) => (
+                    {safeProduct.images.map((_, i) => (
                       <button
                         key={i}
                         onClick={() => setCurrent(i)}
@@ -255,9 +246,9 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Miniaturas */}
-              {product.images.length > 1 && (
+              {safeProduct.images.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto pb-1">
-                  {product.images.map((img, i) => (
+                  {safeProduct.images.map((img, i) => (
                     <button
                       key={i}
                       onClick={() => setCurrent(i)}
@@ -276,9 +267,9 @@ export default function ProductDetailPage() {
             {/* ─── Info ─────────────────────────────────────────────────── */}
             <div className="flex flex-col">
               {/* Tags */}
-              {product.tags.length > 0 && (
+              {safeProduct.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {product.tags.map((tag) => {
+                  {safeProduct.tags.map((tag) => {
                     const cfg = TAG_CONFIG[tag];
                     return (
                       <span key={tag} className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold shadow ${cfg.color}`}>
@@ -289,16 +280,15 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              <h1 className="font-serif text-4xl font-bold text-theme-primary leading-tight sm:text-5xl">{product.name}</h1>
-
-              <p className="mt-4 text-base leading-7 text-theme-secondary">{product.description}</p>
+              <h1 className="font-serif text-4xl font-bold text-theme-primary leading-tight sm:text-5xl">{safeProduct.name}</h1>
+              <p className="mt-4 text-base leading-7 text-theme-secondary">{safeProduct.description}</p>
 
               {/* Precio */}
               <div className="mt-6 flex flex-wrap items-center gap-3">
-                <span className="text-3xl font-bold text-brand-terra">{formatPrice(product.price)}</span>
-                {product.originalPrice && (
+                <span className="text-3xl font-bold text-brand-terra">{formatPrice(safeProduct.price)}</span>
+                {safeProduct.originalPrice && (
                   <>
-                    <span className="text-lg text-theme-secondary line-through">{formatPrice(product.originalPrice)}</span>
+                    <span className="text-lg text-theme-secondary line-through">{formatPrice(safeProduct.originalPrice)}</span>
                     <span className="rounded-full bg-red-500 px-3 py-1 text-sm font-bold text-white">
                       {discountPct}% off
                     </span>
@@ -310,7 +300,7 @@ export default function ProductDetailPage() {
               {isLowStock && (
                 <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1.5 text-sm font-bold text-red-600 dark:bg-red-950 dark:text-red-400 w-fit">
                   <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse inline-block" />
-                  ¡Últimas {product.stock} unidades!
+                  ¡Últimas {safeProduct.stock} unidades!
                 </p>
               )}
 
@@ -345,8 +335,7 @@ export default function ProductDetailPage() {
               >
                 <Image src="/icons/whatsapp.svg" alt="" width={20} height={20} />
                 Consultar por WhatsApp
-                {size && <span className="opacity-80">· {size}</span>}
-              </button>
+                {size && <span className="opacity-80">· {size}</span>}              </button>
 
               {/* Botones de compartir */}
               <div className="mt-4 grid grid-cols-3 gap-2">
