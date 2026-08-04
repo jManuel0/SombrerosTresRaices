@@ -2,6 +2,7 @@ import type { Product } from "./products";
 
 export type CartItem = Product & {
   quantity: number;
+  size: string;
 };
 
 export const whatsappNumber = "573104010930";
@@ -27,7 +28,7 @@ export function createCartMessage(cartItems: CartItem[], cartTotal: number) {
   }
 
   const productLines = cartItems
-    .map((item) => `- ${item.quantity} x ${item.name} (${formatPrice(item.price)} c/u)`)
+    .map((item) => `- ${item.quantity} x ${item.name} | Talla: ${item.size} (${formatPrice(item.price)} c/u)`)
     .join("\n");
 
   return [

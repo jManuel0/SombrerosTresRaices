@@ -18,8 +18,11 @@ const FILTERS: { id: Filter; label: string; emoji: string }[] = [
   { id: "nueva-coleccion", label: "Nueva colección", emoji: "🆕" },
 ];
 
+const SIZES = ["3", "4", "5", "6"];
+
 function ProductCard({ product }: { product: (typeof products)[0] }) {
   const [current, setCurrent] = useState(0);
+  const [size, setSize] = useState("");
   const prev = () => setCurrent((i) => (i - 1 + product.images.length) % product.images.length);
   const next = () => setCurrent((i) => (i + 1) % product.images.length);
 
@@ -69,8 +72,35 @@ function ProductCard({ product }: { product: (typeof products)[0] }) {
         <h2 className="font-serif text-2xl font-bold text-theme-primary">{product.name}</h2>
         <p className="mt-3 text-sm leading-6 text-theme-secondary">{product.description}</p>
         <p className="mt-4 text-lg font-semibold text-brand-terra">{formatPrice(product.price)}</p>
-        <a href={createWhatsAppUrl(`Hola, quiero información sobre el ${product.name}.`)}
-          className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-green px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-theme-light transition hover:bg-brand-terra"
+
+        {/* Selector de talla */}
+        <div className="mt-4">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-theme-secondary">Talla</p>
+          <div className="flex gap-2">
+            {SIZES.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setSize(s)}
+                className={`h-10 w-10 rounded-full border text-sm font-bold transition ${
+                  size === s
+                    ? "border-brand-green bg-brand-green text-theme-light"
+                    : "border-theme bg-theme-surface text-theme-primary hover:border-brand-green"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+          {!size && <p className="mt-1.5 text-xs text-brand-terra">Selecciona una talla</p>}
+        </div>
+
+        <a
+          href={size ? createWhatsAppUrl(`Hola, quiero información sobre el ${product.name} en talla ${size}.`) : "#"}
+          onClick={(e) => { if (!size) e.preventDefault(); }}
+          className={`mt-5 flex w-full items-center justify-center rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-theme-light transition ${
+            size ? "bg-brand-green hover:bg-brand-terra" : "cursor-not-allowed bg-brand-green opacity-50"
+          }`}
         >
           Consultar por WhatsApp
         </a>

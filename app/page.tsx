@@ -67,18 +67,18 @@ export default function Home() {
   const cartTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   const cartMessage = useMemo(() => createCartMessage(cartItems, cartTotal), [cartItems, cartTotal]);
 
-  function addToCart(product: Product) {
+  function addToCart(product: Product, size: string) {
     setCartItems((current) => {
-      const exists = current.some((item) => item.id === product.id);
-      if (exists) return current.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
-      return [...current, { ...product, quantity: 1 }];
+      const exists = current.some((item) => item.id === product.id && item.size === size);
+      if (exists) return current.map((item) => item.id === product.id && item.size === size ? { ...item, quantity: item.quantity + 1 } : item);
+      return [...current, { ...product, quantity: 1, size }];
     });
     setIsCartOpen(true);
   }
 
-  function removeFromCart(productId: string) {
+  function removeFromCart(productId: string, size: string) {
     setCartItems((current) =>
-      current.map((item) => item.id === productId ? { ...item, quantity: item.quantity - 1 } : item)
+      current.map((item) => item.id === productId && item.size === size ? { ...item, quantity: item.quantity - 1 } : item)
              .filter((item) => item.quantity > 0)
     );
   }
@@ -92,7 +92,7 @@ export default function Home() {
       <CatalogPreview onAddToCart={addToCart} />
       <TrustSection />
       <Footer />
-      <CartPanel cartItems={cartItems} cartTotal={cartTotal} isOpen={isCartOpen} message={cartMessage} onClear={clearCart} onClose={() => setIsCartOpen(false)} onRemove={removeFromCart} />
+      <CartPanel cartItems={cartItems} cartTotal={cartTotal} isOpen={isCartOpen} message={cartMessage} onClear={clearCart} onClose={() => setIsCartOpen(false)} onRemove={(id, size) => removeFromCart(id, size)} />
       <FloatingWhatsApp />
     </main>
   );
@@ -252,8 +252,11 @@ function CatalogPreview({ onAddToCart }: Readonly<{ onAddToCart: (product: Produ
   );
 }
 
-function ProductCard({ product, onAddToCart }: Readonly<{ product: Product; onAddToCart: (product: Product) => void }>) {
+const SIZES = ["3", "4", "5", "6"];
+
+function ProductCard({ product, onAddToCart }: Readonly<{ product: Product; onAddToCart: (product: Product, size: string) => void }>) {
   const [current, setCurrent] = useState(0);
+  const [size, setSize] = useState("");
   const prev = () => setCurrent((i) => (i - 1 + product.images.length) % product.images.length);
   const next = () => setCurrent((i) => (i + 1) % product.images.length);
 
@@ -297,9 +300,33 @@ function ProductCard({ product, onAddToCart }: Readonly<{ product: Product; onAd
         <h3 className="mt-2 font-serif text-2xl font-bold text-theme-primary">{product.name}</h3>
         <p className="mt-3 text-sm leading-6 text-theme-secondary">{product.description}</p>
         <p className="mt-4 text-lg font-semibold text-brand-terra">{formatPrice(product.price)}</p>
+
+        {/* Selector de talla */}
+        <div className="mt-4">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-theme-secondary">Talla</p>
+          <div className="flex gap-2">
+            {SIZES.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setSize(s)}
+                className={`h-10 w-10 rounded-full border text-sm font-bold transition ${
+                  size === s
+                    ? "border-brand-green bg-brand-green text-theme-light"
+                    : "border-theme bg-theme-surface text-theme-primary hover:border-brand-green"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+          {!size && <p className="mt-1.5 text-xs text-brand-terra">Selecciona una talla</p>}
+        </div>
+
         <button type="button"
-          className="mt-6 w-full rounded-full border border-brand-green bg-brand-green px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-theme-light transition hover:border-brand-terra hover:bg-brand-terra"
-          onClick={() => onAddToCart(product)}
+          disabled={!size}
+          className="mt-5 w-full rounded-full border border-brand-green bg-brand-green px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-theme-light transition hover:border-brand-terra hover:bg-brand-terra disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={() => size && onAddToCart(product, size)}
         >
           Añadir al carrito
         </button>
@@ -330,7 +357,7 @@ function TrustSection() {
 
 function CartPanel({ cartItems, cartTotal, isOpen, message, onClear, onClose, onRemove }: Readonly<{
   cartItems: CartItem[]; cartTotal: number; isOpen: boolean; message: string;
-  onClear: () => void; onClose: () => void; onRemove: (productId: string) => void;
+  onClear: () => void; onClose: () => void; onRemove: (productId: string, size: string) => void;
 }>) {
   if (!isOpen) return null;
 
@@ -361,11 +388,11 @@ function CartPanel({ cartItems, cartTotal, isOpen, message, onClear, onClose, on
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h3 className="font-serif text-xl font-bold text-theme-primary">{item.name}</h3>
-                      <p className="mt-1 text-sm text-theme-secondary">{item.quantity} unidad{item.quantity > 1 ? "es" : ""} x {formatPrice(item.price)}</p>
+                      <p className="mt-1 text-sm text-theme-secondary">Talla: {item.size} · {item.quantity} unidad{item.quantity > 1 ? "es" : ""} x {formatPrice(item.price)}</p>
                     </div>
                     <button type="button"
                       className="rounded-full border border-theme px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-brand-terra transition hover:bg-theme-muted"
-                      onClick={() => onRemove(item.id)}
+                      onClick={() => onRemove(item.id, item.size)}
                     >
                       Quitar
                     </button>
