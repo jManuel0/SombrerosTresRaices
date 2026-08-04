@@ -169,7 +169,7 @@ function Navbar({ cartCount, isMenuOpen, onCartOpen, onMenuClose, onMenuToggle }
 function Hero() {
   return (
     <section className="relative isolate overflow-hidden">
-      <Image src="https://picsum.photos/seed/sombreros-tres-raices-hero/1800/1100" alt="Sombrero artesanal colombiano sobre una mesa de taller" fill priority sizes="100vw" className="object-cover" />
+      <Image src="/hero.webp" alt="Sombrero artesanal colombiano sobre una mesa de taller" fill priority sizes="100vw" className="object-cover" />
       <div className="absolute inset-0 bg-gradient-to-r from-[#0f1d17]/90 via-[#173326]/68 to-[#6f3927]/20" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_22%,rgba(196,154,58,0.36),transparent_34%),linear-gradient(135deg,rgba(184,92,56,0.25)_0%,rgba(251,245,234,0)_48%,rgba(20,34,27,0.30)_100%)]" />
 
